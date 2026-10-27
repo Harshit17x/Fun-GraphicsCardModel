@@ -761,6 +761,187 @@ body {
   border-radius: 4px;
 }
 
+/* ---------------- 3D Hero Focus Mode Banner & Controls ---------------- */
+.focus-mode-banner {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-24px);
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 14px 8px 16px;
+  background: rgba(14, 16, 20, 0.94);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(118, 185, 0, 0.45);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(118, 185, 0, 0.22);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.focus-mode-banner.visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.focus-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.focus-pulse-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--geforce-green);
+  box-shadow: 0 0 12px rgba(118, 185, 0, 0.9);
+  animation: pulseGreen 1.4s infinite ease-in-out;
+}
+
+.focus-badge {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--geforce-green);
+  background: rgba(118, 185, 0, 0.12);
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(118, 185, 0, 0.35);
+  text-transform: uppercase;
+}
+
+.focus-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.focus-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.focus-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-pill);
+  color: #d0d5dd;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.focus-action-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.focus-action-btn.active {
+  background: rgba(118, 185, 0, 0.2);
+  border-color: var(--geforce-green);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(118, 185, 0, 0.3);
+}
+
+.focus-action-btn.btn-exit-focus {
+  background: rgba(118, 185, 0, 0.16);
+  border-color: rgba(118, 185, 0, 0.45);
+  color: #f0fdf4;
+}
+
+.focus-action-btn.btn-exit-focus:hover {
+  background: rgba(118, 185, 0, 0.32);
+  border-color: var(--geforce-green);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(118, 185, 0, 0.4);
+}
+
+.focus-action-btn kbd {
+  display: inline-block;
+  padding: 1px 4px;
+  font-size: 9px;
+  font-family: inherit;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: #9ca3af;
+  margin-left: 2px;
+}
+
+.focus-btn-icon {
+  font-size: 12px;
+}
+
+/* Part Card Footer Return Button */
+.part-card-footer {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card-focus-return-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 14px;
+  background: rgba(118, 185, 0, 0.12);
+  border: 1px solid rgba(118, 185, 0, 0.35);
+  border-radius: var(--radius-sm);
+  color: #bef264;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card-focus-return-btn:hover {
+  background: rgba(118, 185, 0, 0.25);
+  border-color: var(--geforce-green);
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(118, 185, 0, 0.3);
+}
+
+/* Dim non-focused callouts when 3D Focus mode is active */
+#scene-container.is-part-focused .callout-tag:not(.active) {
+  opacity: 0.12 !important;
+  pointer-events: none !important;
+  filter: grayscale(1);
+  transition: opacity 0.3s ease;
+}
+
+#scene-container.is-part-focused .leader-line-group:not(.active) {
+  opacity: 0.08 !important;
+  transition: opacity 0.3s ease;
+}
+
+#scene-container.is-part-focused .callout-tag.active {
+  transform: scale(1.06);
+  z-index: 25;
+  box-shadow: 0 0 25px rgba(118, 185, 0, 0.55) !important;
+  border-color: var(--geforce-green) !important;
+}
+
 /* Responsive */
 @media (max-width: 680px) {
   .top-bar {

@@ -28,6 +28,13 @@ const statFunction = document.querySelector("#statFunction");
 const statDimensions = document.querySelector("#statDimensions");
 const statCooling = document.querySelector("#statCooling");
 
+// 3D Focus Mode DOM Elements
+const focusModeBanner = document.querySelector("#focusModeBanner");
+const focusTitle = document.querySelector("#focusTitle");
+const btnExitFocus = document.querySelector("#btnExitFocus");
+const btnFocusTurntable = document.querySelector("#btnFocusTurntable");
+const btnCardExitFocus = document.querySelector("#btnCardExitFocus");
+
 // Three.js Scene Setup
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x101216);
@@ -64,6 +71,76 @@ const pointer = new THREE.Vector2(0, 0);
 const raycaster = new THREE.Raycaster();
 const interactiveMeshes = [];
 const groupTransformData = new Map();
+let partGroupByKey = {};
+let heroSpotlight = null;
+
+// 3D Component Inspection / Focus State
+let focusedPartKey = null;
+let isCameraTransitioning = false;
+const cameraStartPos = new THREE.Vector3();
+const cameraEndPos = new THREE.Vector3();
+const cameraStartTarget = new THREE.Vector3();
+const cameraEndTarget = new THREE.Vector3();
+let cameraTransitionProgress = 0.0;
+let isTurntableActive = false;
+
+// 3D Come-Out Vectors for each component
+const focusOffsets = {
+  frontShroud: {
+    "3d": new THREE.Vector3(0, 3.8, 1.8),
+    linear: new THREE.Vector3(0, 1.8, 4.5),
+  },
+  frontFan: {
+    "3d": new THREE.Vector3(-1.0, 4.0, 1.8),
+    linear: new THREE.Vector3(0, 1.8, 4.5),
+  },
+  fanFrame: {
+    "3d": new THREE.Vector3(-1.0, 4.2, 1.8),
+    linear: new THREE.Vector3(0, 1.8, 4.5),
+  },
+  heatsink: {
+    "3d": new THREE.Vector3(0, 4.2, 2.0),
+    linear: new THREE.Vector3(0, 1.8, 4.5),
+  },
+  pcb: {
+    "3d": new THREE.Vector3(0, 5.0, 2.2),
+    linear: new THREE.Vector3(0, 1.8, 4.5),
+  },
+  thermalPlate: {
+    "3d": new THREE.Vector3(0, 4.4, 2.0),
+    linear: new THREE.Vector3(0, 1.8, 4.5),
+  },
+  backplate: {
+    "3d": new THREE.Vector3(0, -4.0, 1.8),
+    linear: new THREE.Vector3(0, 1.8, 4.5),
+  },
+  rearShroud: {
+    "3d": new THREE.Vector3(1.0, -4.0, 1.8),
+    linear: new THREE.Vector3(0, 1.8, 4.5),
+  },
+  bracket: {
+    "3d": new THREE.Vector3(-2.5, 2.0, 2.0),
+    linear: new THREE.Vector3(0, 1.8, 4.5),
+  },
+  pcie: {
+    "3d": new THREE.Vector3(0, 2.0, 3.0),
+    linear: new THREE.Vector3(0, 1.8, 4.5),
+  },
+  power: {
+    "3d": new THREE.Vector3(0, 2.5, -2.5),
+    linear: new THREE.Vector3(0, 1.8, 4.5),
+  },
+};
+
+// Sleek translucent ghost material for contextual background components
+const ghostMaterial = new THREE.MeshStandardMaterial({
+  color: 0x181c24,
+  roughness: 0.8,
+  metalness: 0.1,
+  transparent: true,
+  opacity: 0.16,
+  depthWrite: false,
+});
 
 // ---------------- Textures Generation (NVIDIA Typography & Dies) ----------------
 
@@ -746,7 +823,64 @@ function createRtx4090Card() {
     pcie,
     topBar,
   };
+
+  partGroupByKey = {
+    frontShroud: part1,
+    frontFan: part2,
+    fanFrame: part3,
+    heatsink: part4,
+    pcb: part5,
+    thermalPlate: part6,
+    backplate: part7,
+    rearShroud: part8,
+    bracket,
+    pcie,
+    power: topBar,
+  };
+
+  interactiveMeshes.length = 0;
+  card.traverse((child) => {
+    if (child.isMesh) {
+      interactiveMeshes.push(child);
+      child.userData.origMaterial = child.material;
+    }
+  });
+
   return card;
+}
+
+function getPartKeyFromObject(obj) {
+  let curr = obj;
+  while (curr && curr.parent && curr !== card) {
+    if (curr.userData && curr.userData.partKey) {
+      return curr.userData.partKey;
+    }
+    curr = curr.parent;
+  }
+  return null;
+}
+
+function applyFocusMaterials(focusedKey) {
+  if (!focusedKey) {
+    interactiveMeshes.forEach((mesh) => {
+      if (mesh.userData.origMaterial) {
+        mesh.material = mesh.userData.origMaterial;
+      }
+    });
+    return;
+  }
+
+  interactiveMeshes.forEach((mesh) => {
+    const key = getPartKeyFromObject(mesh);
+    if (!mesh.userData.origMaterial) {
+      mesh.userData.origMaterial = mesh.material;
+    }
+    if (key === focusedKey) {
+      mesh.material = mesh.userData.origMaterial;
+    } else {
+      mesh.material = ghostMaterial;
+    }
+  });
 }
 
 // ---------------- Studio Lighting (Cinematic GeForce Look) ----------------
@@ -806,6 +940,13 @@ function createStudioLighting() {
   const topFill = new THREE.PointLight(0xffffff, 3.2, 18, 1.8);
   topFill.position.set(1, 10, 2);
   scene.add(topFill);
+
+  // Dedicated Hero Spotlight for 3D Component Inspection Mode
+  heroSpotlight = new THREE.SpotLight(0xffffff, 0, 45, Math.PI / 4, 0.45, 1.2);
+  heroSpotlight.position.set(3, 14, 12);
+  heroSpotlight.castShadow = true;
+  scene.add(heroSpotlight);
+  scene.add(heroSpotlight.target);
 }
 
 const card = createRtx4090Card();
@@ -896,6 +1037,33 @@ const partData = {
     dims: "304 mm × 137 mm × 14 mm",
     cooling: "Pushes Hot Air Out Top/Back of Chassis",
   },
+  bracket: {
+    num: "I/O PORT",
+    title: "Stainless Steel 3-Slot I/O Bracket",
+    desc: "Rigid stainless steel chassis mounting bracket featuring hexagonal flow exhaust cutouts, 3x DisplayPort 2.1 outputs, and 1x HDMI 2.1a port.",
+    material: "Stamped Stainless Steel (AISI 304)",
+    arch: "Triple-Slot Rigid Chassis Mount",
+    dims: "120 mm × 61 mm × 1.2 mm",
+    cooling: "Passive High-Velocity Hexagonal Vent",
+  },
+  pcie: {
+    num: "BUS INTERFACE",
+    title: "PCIe 4.0 x16 Gold Finger Connector",
+    desc: "High-bandwidth 16-lane peripheral component interface with 30 micro-inch electroplated hard gold contacts supporting up to 64 GB/s bi-directional throughput.",
+    material: "FR-4 PCB with Hard Gold Electroplate",
+    arch: "PCI Express Gen 4.0 x16 Signaling",
+    dims: "89 mm × 11 mm × 1.6 mm",
+    cooling: "Direct Motherboard Bus Interface",
+  },
+  power: {
+    num: "POWER INLET",
+    title: "16-Pin 12VHPWR Connector & Logo",
+    desc: "Side-mounted ATX 3.0 PCIe 5.0 12VHPWR power connector rated for 600W sustained delivery, accompanied by the signature white-illuminated GEFORCE RTX logo plate.",
+    material: "High-Temp Polyamide & Gold-Plated Terminals",
+    arch: "12 Power + 4 Sideband Sense Pins (600W)",
+    dims: "32 mm × 18 mm × 14 mm",
+    cooling: "Illuminated Side Branding & 12V Power Delivery",
+  },
 };
 
 function showPartInfo(key) {
@@ -921,9 +1089,132 @@ function hidePartInfo() {
   partPills.forEach((p) => p.classList.remove("active"));
 }
 
-if (partCardClose) {
-  partCardClose.addEventListener("click", hidePartInfo);
+function focusOnPart(key) {
+  if (!key || !partData[key]) return;
+  focusedPartKey = key;
+
+  // If card is assembled or barely exploded, expand it enough so the component detaches cleanly
+  if (explosionTarget < 0.4) {
+    setExplosionTarget(0.75);
+  }
+
+  showPartInfo(key);
+
+  // Update Focus Mode Banner
+  if (focusModeBanner && focusTitle) {
+    focusTitle.textContent = partData[key].title;
+    focusModeBanner.classList.add("visible");
+  }
+
+  if (sceneContainer) {
+    sceneContainer.classList.add("is-part-focused");
+  }
+
+  applyFocusMaterials(key);
+
+  // Determine target 3D world position of the component
+  const group = partGroupByKey[key];
+  if (!group) return;
+
+  card.updateMatrixWorld(true);
+  const partWorldCenter = new THREE.Vector3();
+  group.getWorldPosition(partWorldCenter);
+
+  // Add the focus offset to the predicted world center
+  const offset = (focusOffsets[key] && focusOffsets[key][explodeMode]) || new THREE.Vector3(0, 4.0, 2.0);
+  const worldOffset = offset.clone().applyQuaternion(card.quaternion);
+  const targetCenter = partWorldCenter.clone().add(worldOffset);
+
+  // Camera framing:
+  const cardFrontNormal = new THREE.Vector3(0, 1, 0).applyQuaternion(card.quaternion).normalize();
+  const isRear = key === "backplate" || key === "rearShroud";
+
+  let targetCamPos;
+  if (isRear) {
+    const cardBackNormal = cardFrontNormal.clone().negate();
+    targetCamPos = targetCenter.clone()
+      .addScaledVector(cardBackNormal, 9.5)
+      .add(new THREE.Vector3(-1.8, -4.5, -4.0));
+  } else {
+    targetCamPos = targetCenter.clone()
+      .addScaledVector(cardFrontNormal, 9.5)
+      .add(new THREE.Vector3(1.8, 4.5, 4.5));
+  }
+
+  cameraStartPos.copy(camera.position);
+  cameraStartTarget.copy(controls.target);
+  cameraEndPos.copy(targetCamPos);
+  cameraEndTarget.copy(targetCenter);
+  cameraTransitionProgress = 0.0;
+  isCameraTransitioning = true;
 }
+
+function clearPartFocus() {
+  if (!focusedPartKey) return;
+  focusedPartKey = null;
+
+  if (focusModeBanner) {
+    focusModeBanner.classList.remove("visible");
+  }
+  if (sceneContainer) {
+    sceneContainer.classList.remove("is-part-focused");
+  }
+
+  if (btnFocusTurntable) {
+    btnFocusTurntable.classList.remove("active");
+  }
+  isTurntableActive = false;
+  controls.autoRotate = false;
+  if (btnAutoRotate) {
+    btnAutoRotate.classList.remove("active");
+  }
+
+  applyFocusMaterials(null);
+
+  cameraStartPos.copy(camera.position);
+  cameraStartTarget.copy(controls.target);
+  cameraEndPos.copy(baseCameraPosition);
+  cameraEndTarget.copy(baseTarget);
+  cameraTransitionProgress = 0.0;
+  isCameraTransitioning = true;
+}
+
+if (btnExitFocus) {
+  btnExitFocus.addEventListener("click", () => {
+    clearPartFocus();
+    hidePartInfo();
+  });
+}
+
+if (btnCardExitFocus) {
+  btnCardExitFocus.addEventListener("click", () => {
+    clearPartFocus();
+    hidePartInfo();
+  });
+}
+
+if (btnFocusTurntable) {
+  btnFocusTurntable.addEventListener("click", () => {
+    isTurntableActive = !isTurntableActive;
+    btnFocusTurntable.classList.toggle("active", isTurntableActive);
+    controls.autoRotate = isTurntableActive;
+    controls.autoRotateSpeed = 1.2;
+    if (btnAutoRotate) {
+      btnAutoRotate.classList.toggle("active", isTurntableActive);
+    }
+  });
+}
+
+if (partCardClose) {
+  partCardClose.addEventListener("click", () => {
+    hidePartInfo();
+    clearPartFocus();
+  });
+}
+
+controls.addEventListener("start", () => {
+  isCameraTransitioning = false;
+});
 
 // ---------------- HUD & Controls Logic ----------------
 function setExplosionTarget(target) {
@@ -980,10 +1271,7 @@ presetButtons.forEach((btn) => {
 partPills.forEach((btn) => {
   btn.addEventListener("click", () => {
     const part = btn.dataset.part;
-    showPartInfo(part);
-    if (explosionTarget < 0.25) {
-      setExplosionTarget(1.0);
-    }
+    focusOnPart(part);
   });
 });
 
@@ -1014,6 +1302,7 @@ if (btnAutoRotate) {
 }
 
 function resetCamera() {
+  clearPartFocus();
   camera.position.copy(baseCameraPosition);
   controls.target.copy(baseTarget);
   controls.update();
@@ -1043,7 +1332,7 @@ calloutMap.forEach((item) => {
   const el = document.getElementById(item.id);
   if (el) {
     item.el = el;
-    el.addEventListener("click", () => showPartInfo(item.key));
+    el.addEventListener("click", () => focusOnPart(item.key));
     el.addEventListener("mouseenter", () => {
       hoveredPartKey = item.key;
       updateLeaderHighlight();
@@ -1079,8 +1368,9 @@ calloutMap.forEach((item) => {
 });
 
 function updateLeaderHighlight() {
+  const activeKey = focusedPartKey || hoveredPartKey;
   calloutMap.forEach((item) => {
-    const isAct = item.key === hoveredPartKey;
+    const isAct = item.key === activeKey;
     if (item.el) item.el.classList.toggle("active", isAct);
     const leader = leaderElements.get(item.key);
     if (leader) leader.g.classList.toggle("active", isAct);
@@ -1263,6 +1553,10 @@ function updateCallouts() {
 }
 
 // ---------------- Animation Loop ----------------
+const partFocusProgressMap = new Map();
+const tempBasePos = new THREE.Vector3();
+const tempTargetPos = new THREE.Vector3();
+
 function animateParts() {
   explosionProgress += (explosionTarget - explosionProgress) * 0.085;
 
@@ -1270,10 +1564,35 @@ function animateParts() {
     explodeValue.textContent = `${Math.round(explosionProgress * 100)}%`;
   }
 
-  // Smooth lerp based on selected mode
+  // Smooth lerp based on selected mode + 3D Component Inspection Elevation
   groupTransformData.forEach((data, object) => {
-    const targetPos = explodeMode === "3d" ? data.stack : data.linear;
-    object.position.lerpVectors(data.normal, targetPos, explosionProgress);
+    const baseExploded = explodeMode === "3d" ? data.stack : data.linear;
+    tempBasePos.lerpVectors(data.normal, baseExploded, explosionProgress);
+
+    const partKey = object.userData && object.userData.partKey;
+    const isThisFocused = focusedPartKey && partKey === focusedPartKey;
+
+    let curFocus = partFocusProgressMap.get(object) || 0.0;
+    const targetFocus = isThisFocused ? 1.0 : (focusedPartKey ? -0.3 : 0.0);
+    curFocus += (targetFocus - curFocus) * 0.085;
+    partFocusProgressMap.set(object, curFocus);
+
+    if (Math.abs(curFocus) > 0.001) {
+      if (curFocus > 0) {
+        // Focused part: comes out in 3D into hero position!
+        const offset = (focusOffsets[partKey] && focusOffsets[partKey][explodeMode]) 
+          || new THREE.Vector3(0, 4.0, 2.0);
+        tempTargetPos.copy(tempBasePos).add(offset);
+        object.position.lerpVectors(tempBasePos, tempTargetPos, curFocus);
+      } else {
+        // Non-focused parts: smoothly step back slightly (-0.8 in Z) for extra depth separation
+        const recedeVec = new THREE.Vector3(0, 0, -0.8);
+        tempTargetPos.copy(tempBasePos).add(recedeVec);
+        object.position.lerpVectors(tempBasePos, tempTargetPos, -curFocus / 0.3);
+      }
+    } else {
+      object.position.copy(tempBasePos);
+    }
   });
 }
 
@@ -1281,12 +1600,36 @@ function animate() {
   requestAnimationFrame(animate);
   const elapsed = clock.getElapsedTime();
 
+  // Smooth camera glide during 3D focus transition
+  if (isCameraTransitioning) {
+    cameraTransitionProgress += 0.045;
+    if (cameraTransitionProgress >= 1.0) {
+      cameraTransitionProgress = 1.0;
+      isCameraTransitioning = false;
+    }
+    const t = 1 - Math.pow(1 - cameraTransitionProgress, 3);
+    camera.position.lerpVectors(cameraStartPos, cameraEndPos, t);
+    controls.target.lerpVectors(cameraStartTarget, cameraEndTarget, t);
+  }
+
   controls.update();
   animateParts();
   updateCallouts();
 
-  // Subtle floating breathing hover
-  card.position.y = Math.sin(elapsed * 0.7) * 0.05;
+  // Update hero spotlight tracking focused part
+  if (heroSpotlight) {
+    if (focusedPartKey && partGroupByKey[focusedPartKey]) {
+      const targetWorldPos = new THREE.Vector3();
+      partGroupByKey[focusedPartKey].getWorldPosition(targetWorldPos);
+      heroSpotlight.target.position.copy(targetWorldPos);
+      heroSpotlight.intensity = THREE.MathUtils.lerp(heroSpotlight.intensity, 6.0, 0.08);
+    } else {
+      heroSpotlight.intensity = THREE.MathUtils.lerp(heroSpotlight.intensity, 0.0, 0.1);
+    }
+  }
+
+  // Subtle floating breathing hover (damped during focus)
+  card.position.y = Math.sin(elapsed * 0.7) * (focusedPartKey ? 0.02 : 0.05);
 
   // Front Intake Fan and Rear Exhaust Fan dynamic rotation (Counter-rotating flow)
   if (card.userData.part2.userData.fan) {
@@ -1303,14 +1646,7 @@ function animate() {
 
   let meshHoveredKey = null;
   if (intersections.length > 0) {
-    let curr = intersections[0].object;
-    while (curr && curr.parent && curr !== card) {
-      if (curr.userData && curr.userData.partKey) {
-        meshHoveredKey = curr.userData.partKey;
-        break;
-      }
-      curr = curr.parent;
-    }
+    meshHoveredKey = getPartKeyFromObject(intersections[0].object);
   }
 
   if (meshHoveredKey !== hoveredPartKey) {
@@ -1322,34 +1658,54 @@ function animate() {
 }
 
 // ---------------- Event Handlers ----------------
+let pointerDownPos = { x: 0, y: 0 };
+let isDragMove = false;
+
+canvas.addEventListener("pointerdown", (e) => {
+  pointerDownPos = { x: e.clientX, y: e.clientY };
+  isDragMove = false;
+});
+
 canvas.addEventListener("pointermove", (e) => {
   const bounds = canvas.getBoundingClientRect();
   pointer.x = ((e.clientX - bounds.left) / bounds.width) * 2 - 1;
   pointer.y = -((e.clientY - bounds.top) / bounds.height) * 2 + 1;
+
+  const dx = e.clientX - pointerDownPos.x;
+  const dy = e.clientY - pointerDownPos.y;
+  if (Math.hypot(dx, dy) > 5) {
+    isDragMove = true;
+  }
 });
 
 canvas.addEventListener("pointerleave", () => {
   pointer.set(0, 0);
 });
 
-// Click mesh to show part info
+// Click mesh to focus and bring out in 3D
 canvas.addEventListener("click", () => {
+  if (isDragMove) return;
   raycaster.setFromCamera(pointer, camera);
   const hits = raycaster.intersectObjects(interactiveMeshes, true);
   if (hits.length > 0) {
-    let curr = hits[0].object;
-    while (curr && curr.parent && curr !== card) {
-      if (curr.userData && curr.userData.partKey) {
-        showPartInfo(curr.userData.partKey);
-        return;
-      }
-      curr = curr.parent;
+    const key = getPartKeyFromObject(hits[0].object);
+    if (key) {
+      focusOnPart(key);
+      return;
     }
+  } else if (focusedPartKey) {
+    clearPartFocus();
+    hidePartInfo();
   }
 });
 
 // Keyboard Shortcuts
 window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    clearPartFocus();
+    hidePartInfo();
+    return;
+  }
   if (e.key.toLowerCase() === "e" || e.code === "Space") {
     e.preventDefault();
     setExplosionTarget(explosionTarget > 0.5 ? 0.0 : 1.0);
@@ -1364,10 +1720,7 @@ window.addEventListener("keydown", (e) => {
     }
   } else if (e.key >= "1" && e.key <= "8") {
     const keys = ["frontShroud", "frontFan", "fanFrame", "heatsink", "pcb", "thermalPlate", "backplate", "rearShroud"];
-    showPartInfo(keys[parseInt(e.key, 10) - 1]);
-    if (explosionTarget < 0.25) {
-      setExplosionTarget(1.0);
-    }
+    focusOnPart(keys[parseInt(e.key, 10) - 1]);
   }
 });
 

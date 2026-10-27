@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#121316" />
     <title>NVIDIA GeForce RTX 4090 Founders Edition — 3D Exploded View</title>
-    <link rel="stylesheet" href="./styles.css?v=10" />
+    <link rel="stylesheet" href="./styles.css?v=11" />
   </head>
   <body>
     <main id="scene-container" aria-label="Interactive NVIDIA GeForce RTX 4090 Founders Edition 3D visualization">
@@ -43,6 +43,26 @@
           </button>
         </div>
       </header>
+
+      <!-- 3D Component Inspection Mode Floating Banner -->
+      <div class="focus-mode-banner" id="focusModeBanner" aria-live="polite">
+        <div class="focus-banner-left">
+          <div class="focus-pulse-dot"></div>
+          <span class="focus-badge">3D HERO FOCUS</span>
+          <span class="focus-title" id="focusTitle">Component Name</span>
+        </div>
+        <div class="focus-banner-actions">
+          <button class="focus-action-btn" id="btnFocusTurntable" title="Toggle 360° Turntable Orbit">
+            <span class="focus-btn-icon">⟳</span>
+            <span>Turntable</span>
+          </button>
+          <button class="focus-action-btn btn-exit-focus" id="btnExitFocus" title="Return to Overview (Esc)">
+            <span class="focus-btn-icon">✕</span>
+            <span>Return to Full Card</span>
+            <kbd>Esc</kbd>
+          </button>
+        </div>
+      </div>
 
       <!-- 3D Callout Badges Layer & Leader Lines (Projected from 3D world space) -->
       <div id="callout-overlay" aria-hidden="true">
@@ -140,6 +160,11 @@
             <span class="stat-value" id="statCooling">-</span>
           </div>
         </div>
+        <div class="part-card-footer">
+          <button id="btnCardExitFocus" class="card-focus-return-btn" title="Return to Full Card (Esc)">
+            <span>←</span> Return to Full Model
+          </button>
+        </div>
       </aside>
 
       <!-- Dimension Overlay Box (Toggleable Reference overlay) -->
@@ -215,9 +240,11 @@
         <div class="hotkey-hints">
           <span><kbd>Space</kbd> / <kbd>E</kbd> Explode</span>
           <span>&bull;</span>
-          <span><kbd>1</kbd>–<kbd>8</kbd> Inspect Parts</span>
+          <span><kbd>Click</kbd> / <kbd>1</kbd>–<kbd>8</kbd> 3D Inspect</span>
           <span>&bull;</span>
-          <span><kbd>M</kbd> Explode Mode</span>
+          <span><kbd>Esc</kbd> Exit Focus</span>
+          <span>&bull;</span>
+          <span><kbd>M</kbd> Mode</span>
           <span>&bull;</span>
           <span><kbd>R</kbd> Reset</span>
           <span>&bull;</span>
@@ -233,6 +260,6 @@
         }
       }
     </script>
-    <script type="module" src="./main.js?v=10"></script>
+    <script type="module" src="./main.js?v=11"></script>
   </body>
 </html>
