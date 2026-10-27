@@ -30,11 +30,11 @@ const statCooling = document.querySelector("#statCooling");
 
 // Three.js Scene Setup
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0e1014);
+scene.background = new THREE.Color(0x101216);
 
 const camera = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 120);
-// Tilted perspective showcasing the iconic front hourglass X-frame and axial fan
-camera.position.set(5.5, 17.5, 12.5);
+// Tilted perspective showcasing the iconic front hourglass X-frame and axial fan with balanced framing
+camera.position.set(5.0, 16.5, 13.5);
 
 const renderer = new THREE.WebGLRenderer({
   canvas,
@@ -45,7 +45,7 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.35;
+renderer.toneMappingExposure = 1.68;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -212,29 +212,29 @@ function createBackplateXTexture() {
 const palette = {
   // Champagne/Titanium anodized unibody frame
   champagne: new THREE.MeshPhysicalMaterial({
-    color: 0xc2b59b,
-    metalness: 0.9,
+    color: 0xd6ccb4,
+    metalness: 0.88,
     roughness: 0.22,
-    clearcoat: 0.55,
-    clearcoatRoughness: 0.18,
+    clearcoat: 0.65,
+    clearcoatRoughness: 0.16,
   }),
-  // Powder-coated matte obsidian black body
+  // Powder-coated matte obsidian black body (lifted from crushed black to rich graphite)
   matteBlack: new THREE.MeshPhysicalMaterial({
-    color: 0x141518,
-    metalness: 0.32,
-    roughness: 0.44,
+    color: 0x242830,
+    metalness: 0.26,
+    roughness: 0.4,
   }),
   // Dark graphite anodized aluminum
-  graphite: new THREE.MeshStandardMaterial({ color: 0x24272c, metalness: 0.78, roughness: 0.28 }),
-  graphiteSoft: new THREE.MeshStandardMaterial({ color: 0x3a3f45, metalness: 0.68, roughness: 0.35 }),
+  graphite: new THREE.MeshStandardMaterial({ color: 0x343942, metalness: 0.74, roughness: 0.26 }),
+  graphiteSoft: new THREE.MeshStandardMaterial({ color: 0x48505a, metalness: 0.65, roughness: 0.32 }),
   // Cooling radiator aluminum fins
-  finMetal: new THREE.MeshStandardMaterial({ color: 0x484f56, metalness: 0.88, roughness: 0.26 }),
-  finMetalDark: new THREE.MeshStandardMaterial({ color: 0x2c3136, metalness: 0.82, roughness: 0.32 }),
+  finMetal: new THREE.MeshStandardMaterial({ color: 0x6e7885, metalness: 0.85, roughness: 0.24 }),
+  finMetalDark: new THREE.MeshStandardMaterial({ color: 0x444b54, metalness: 0.8, roughness: 0.3 }),
   // Sintered copper heat pipes
-  copper: new THREE.MeshStandardMaterial({ color: 0xc87042, metalness: 0.95, roughness: 0.22 }),
+  copper: new THREE.MeshStandardMaterial({ color: 0xe37d48, metalness: 0.94, roughness: 0.16 }),
   // High-density PCB substrate
-  pcb: new THREE.MeshStandardMaterial({ color: 0x09261a, metalness: 0.25, roughness: 0.55 }),
-  pcbTrace: new THREE.MeshStandardMaterial({ color: 0x4db5b9, metalness: 0.55, roughness: 0.3 }),
+  pcb: new THREE.MeshStandardMaterial({ color: 0x134832, metalness: 0.25, roughness: 0.48 }),
+  pcbTrace: new THREE.MeshStandardMaterial({ color: 0x5cd3d8, metalness: 0.6, roughness: 0.25 }),
   // Mirror-polished silicon GPU die
   siliconDie: new THREE.MeshPhysicalMaterial({
     map: createGpuDieTexture(),
@@ -244,22 +244,22 @@ const palette = {
     clearcoatRoughness: 0.05,
   }),
   // Micron GDDR6X BGA ICs
-  vramChip: new THREE.MeshStandardMaterial({ color: 0x181a1d, metalness: 0.6, roughness: 0.3 }),
+  vramChip: new THREE.MeshStandardMaterial({ color: 0x252930, metalness: 0.58, roughness: 0.26 }),
   // Hard gold contacts (PCIe and 12VHPWR)
-  gold: new THREE.MeshStandardMaterial({ color: 0xd9a845, metalness: 0.98, roughness: 0.15 }),
+  gold: new THREE.MeshStandardMaterial({ color: 0xe5b44c, metalness: 0.98, roughness: 0.12 }),
   // Blue silicone thermal conductivity pads
-  thermalPad: new THREE.MeshStandardMaterial({ color: 0x2e6f8a, roughness: 0.85, metalness: 0.1 }),
+  thermalPad: new THREE.MeshStandardMaterial({ color: 0x3d8ca8, roughness: 0.78, metalness: 0.1 }),
   // Brushed stainless steel I/O bracket
-  steel: new THREE.MeshStandardMaterial({ color: 0x858e96, metalness: 0.94, roughness: 0.2 }),
-  // Fan impeller blades
+  steel: new THREE.MeshStandardMaterial({ color: 0x9ea9b4, metalness: 0.94, roughness: 0.18 }),
+  // Fan impeller blades (clearly visible, catching light as it spins)
   fanBlade: new THREE.MeshPhysicalMaterial({
-    color: 0x16181b,
-    metalness: 0.45,
-    roughness: 0.3,
-    clearcoat: 0.4,
+    color: 0x272c34,
+    metalness: 0.42,
+    roughness: 0.26,
+    clearcoat: 0.5,
   }),
   // Spun metal metallic fan spinner hub
-  fanHubSpinner: new THREE.MeshStandardMaterial({ color: 0x98a2ad, metalness: 0.92, roughness: 0.18 }),
+  fanHubSpinner: new THREE.MeshStandardMaterial({ color: 0xabb5bf, metalness: 0.92, roughness: 0.16 }),
   // Illuminated GEFORCE RTX side logo
   geforceGlow: new THREE.MeshBasicMaterial({
     map: createGeforceLogoTexture(),
@@ -267,8 +267,8 @@ const palette = {
   // DisplayPort blue status glow
   blueGlow: new THREE.MeshStandardMaterial({
     color: 0x76b900,
-    emissive: 0x3d6600,
-    emissiveIntensity: 1.6,
+    emissive: 0x4a7c00,
+    emissiveIntensity: 1.8,
   }),
 };
 
@@ -751,29 +751,60 @@ function createRtx4090Card() {
 
 // ---------------- Studio Lighting (Cinematic GeForce Look) ----------------
 function createStudioLighting() {
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x181a20, 1.4));
+  // Ambient base fill: eliminates dark crushed shadows, keeping all components crisp & visible
+  const ambientLight = new THREE.AmbientLight(0xdde6f2, 2.2);
+  scene.add(ambientLight);
 
-  const keyLight = new THREE.DirectionalLight(0xffffff, 4.6);
-  keyLight.position.set(6, 12, 10);
+  // Hemisphere lighting: cool crisp sky overhead and warm soft ground bounce
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x3d4552, 2.4);
+  scene.add(hemiLight);
+
+  // Key directional light: sharp definition and metallic specular highlights
+  const keyLight = new THREE.DirectionalLight(0xffffff, 5.2);
+  keyLight.position.set(8, 15, 11);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(2048, 2048);
-  keyLight.shadow.camera.left = -12;
-  keyLight.shadow.camera.right = 12;
-  keyLight.shadow.camera.top = 12;
-  keyLight.shadow.camera.bottom = -12;
+  keyLight.shadow.camera.left = -14;
+  keyLight.shadow.camera.right = 14;
+  keyLight.shadow.camera.top = 14;
+  keyLight.shadow.camera.bottom = -14;
+  keyLight.shadow.bias = -0.0004;
+  keyLight.shadow.radius = 2.5;
   scene.add(keyLight);
 
-  const rimLight = new THREE.DirectionalLight(0xcfd8e3, 3.8);
-  rimLight.position.set(-8, 5, -6);
+  // Broad Front-Fill Light: directly illuminates the front fascia, fans, and heatsink fin array
+  const frontFill = new THREE.DirectionalLight(0xf2f7fc, 3.8);
+  frontFill.position.set(0, 5, 15);
+  scene.add(frontFill);
+
+  // Under-Fill Uplight: brightly illuminates the underside, backplate, and rear shroud when exploded
+  const underFill = new THREE.DirectionalLight(0x9cb0c5, 3.6);
+  underFill.position.set(0, -14, 5);
+  scene.add(underFill);
+
+  // Left-Side Fill Light: illuminates the stainless steel I/O bracket and display ports
+  const leftFill = new THREE.DirectionalLight(0xcfdbe8, 3.0);
+  leftFill.position.set(-14, 3, 5);
+  scene.add(leftFill);
+
+  // Rear Rim Light: traces the champagne anodized titanium chamfers and silhouette
+  const rimLight = new THREE.DirectionalLight(0xdce7f4, 4.4);
+  rimLight.position.set(-9, 8, -10);
   scene.add(rimLight);
 
   // Signature NVIDIA GeForce green accent glow
-  const greenGlow = new THREE.PointLight(0x76b900, 2.4, 16, 2);
-  greenGlow.position.set(-5, 3.5, 4.5);
+  const greenGlow = new THREE.PointLight(0x76b900, 3.4, 20, 1.8);
+  greenGlow.position.set(-5, 4, 4.5);
   scene.add(greenGlow);
 
-  const topFill = new THREE.PointLight(0xffffff, 2.5, 14, 2);
-  topFill.position.set(0, 9, 0);
+  // Internal component glow: emits between heatsink and PCB to illuminate the AD102 die and traces
+  const internalGlow = new THREE.PointLight(0x6ee790, 2.2, 14, 2);
+  internalGlow.position.set(0, 0, 0);
+  scene.add(internalGlow);
+
+  // Soft overhead studio fill
+  const topFill = new THREE.PointLight(0xffffff, 3.2, 18, 1.8);
+  topFill.position.set(1, 10, 2);
   scene.add(topFill);
 }
 
@@ -990,59 +1021,244 @@ function resetCamera() {
   hidePartInfo();
 }
 
-// ---------------- 3D Screen-Space Callouts ----------------
+// ---------------- 3D Screen-Space Callouts & SVG Leader Lines ----------------
+const svgLayer = document.getElementById("callout-lines");
+const leaderElements = new Map();
+
 const calloutMap = [
-  { id: "tagFrontShroud", key: "frontShroud", group: card.userData.part1, offset: [0, 0.45, 0] },
-  { id: "tagFrontFan", key: "frontFan", group: card.userData.part2, offset: [0, 0.45, 0] },
-  { id: "tagFanFrame", key: "fanFrame", group: card.userData.part3, offset: [0, 0.4, 0] },
-  { id: "tagHeatsink", key: "heatsink", group: card.userData.part4, offset: [0, 0.5, 0] },
-  { id: "tagPcb", key: "pcb", group: card.userData.part5, offset: [0, 0.35, 0] },
-  { id: "tagThermalPlate", key: "thermalPlate", group: card.userData.part6, offset: [0, -0.4, 0] },
-  { id: "tagBackplate", key: "backplate", group: card.userData.part7, offset: [0, -0.45, 0] },
-  { id: "tagRearShroud", key: "rearShroud", group: card.userData.part8, offset: [0, -0.5, 0] },
+  { id: "tagFrontShroud", key: "frontShroud", group: card.userData.part1, localOffset: [-2.0, 0.35, 0.0], flank: "right" },
+  { id: "tagFrontFan", key: "frontFan", group: card.userData.part2, localOffset: [0.0, 0.3, 0.0], flank: "right" },
+  { id: "tagFanFrame", key: "fanFrame", group: card.userData.part3, localOffset: [1.2, 0.25, 0.6], flank: "right" },
+  { id: "tagHeatsink", key: "heatsink", group: card.userData.part4, localOffset: [0.0, 0.35, 0.6], flank: "right" },
+  { id: "tagPcb", key: "pcb", group: card.userData.part5, localOffset: [-2.45, 0.22, 0.0], flank: "left" },
+  { id: "tagThermalPlate", key: "thermalPlate", group: card.userData.part6, localOffset: [1.6, 0.15, -0.4], flank: "left" },
+  { id: "tagBackplate", key: "backplate", group: card.userData.part7, localOffset: [0.0, -0.2, 0.0], flank: "left" },
+  { id: "tagRearShroud", key: "rearShroud", group: card.userData.part8, localOffset: [-2.45, -0.3, 0.0], flank: "left" },
 ];
 
+let hoveredPartKey = null;
+
+// Initialize cached SVG elements for leader lines
 calloutMap.forEach((item) => {
   const el = document.getElementById(item.id);
   if (el) {
     item.el = el;
     el.addEventListener("click", () => showPartInfo(item.key));
+    el.addEventListener("mouseenter", () => {
+      hoveredPartKey = item.key;
+      updateLeaderHighlight();
+    });
+    el.addEventListener("mouseleave", () => {
+      if (hoveredPartKey === item.key) hoveredPartKey = null;
+      updateLeaderHighlight();
+    });
+  }
+
+  if (svgLayer) {
+    const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    g.setAttribute("class", "leader-line-group");
+    g.id = `leader-${item.key}`;
+
+    const pulseCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    pulseCircle.setAttribute("class", "leader-anchor-pulse");
+
+    const anchorCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    anchorCircle.setAttribute("class", "leader-anchor-dot");
+    anchorCircle.setAttribute("r", "3.5");
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("class", "leader-path");
+
+    g.appendChild(path);
+    g.appendChild(pulseCircle);
+    g.appendChild(anchorCircle);
+    svgLayer.appendChild(g);
+
+    leaderElements.set(item.key, { g, path, pulseCircle, anchorCircle });
   }
 });
+
+function updateLeaderHighlight() {
+  calloutMap.forEach((item) => {
+    const isAct = item.key === hoveredPartKey;
+    if (item.el) item.el.classList.toggle("active", isAct);
+    const leader = leaderElements.get(item.key);
+    if (leader) leader.g.classList.toggle("active", isAct);
+  });
+}
 
 const tempWorldVec = new THREE.Vector3();
 
 function updateCallouts() {
   const width = window.innerWidth;
   const height = window.innerHeight;
-  const isExplodedEnough = explosionProgress > 0.16;
+  const isExplodedEnough = explosionProgress > 0.14;
 
-  calloutMap.forEach(({ el, group, offset }) => {
-    if (!el || !group) return;
+  if (!isExplodedEnough) {
+    calloutMap.forEach((item) => {
+      if (item.el) item.el.classList.remove("visible");
+      const leader = leaderElements.get(item.key);
+      if (leader) leader.g.style.display = "none";
+    });
+    return;
+  }
 
-    if (!isExplodedEnough) {
-      el.classList.remove("visible");
-      return;
-    }
+  // Calculate 3D projected anchor coordinates for each part
+  const activeItems = [];
+  calloutMap.forEach((item) => {
+    if (!item.el || !item.group) return;
 
-    group.getWorldPosition(tempWorldVec);
-    tempWorldVec.x += offset[0];
-    tempWorldVec.y += offset[1];
-    tempWorldVec.z += offset[2];
-
+    tempWorldVec.set(...item.localOffset);
+    item.group.localToWorld(tempWorldVec);
     tempWorldVec.project(camera);
 
     if (tempWorldVec.z > 1.0) {
-      el.classList.remove("visible");
+      item.el.classList.remove("visible");
+      const leader = leaderElements.get(item.key);
+      if (leader) leader.g.style.display = "none";
       return;
     }
 
-    const screenX = (tempWorldVec.x * 0.5 + 0.5) * width;
-    const screenY = (-(tempWorldVec.y * 0.5) + 0.5) * height;
+    const ax = (tempWorldVec.x * 0.5 + 0.5) * width;
+    const ay = (-(tempWorldVec.y * 0.5) + 0.5) * height;
 
-    el.style.left = `${screenX.toFixed(1)}px`;
-    el.style.top = `${screenY.toFixed(1)}px`;
+    activeItems.push({
+      item,
+      ax,
+      ay,
+      el: item.el,
+      key: item.key,
+      flank: item.flank,
+    });
+  });
+
+  if (activeItems.length === 0) return;
+
+  const minSpacing = 50;
+
+  if (explodeMode === "3d") {
+    // Symmetrical Dual Flank Layout:
+    // Right Flank: Parts 1, 2, 3, 4 (Shroud, Fan, Frame, Heatsink)
+    // Left Flank: Parts 5, 6, 7, 8 (PCB, Midplate, Backplate, Rear Shroud)
+    const rightItems = activeItems.filter((i) => i.flank === "right");
+    const leftItems = activeItems.filter((i) => i.flank === "left");
+
+    // Right Flank Placement (placed to the right of the components)
+    if (rightItems.length > 0) {
+      const isCardOpen = partCard && partCard.classList.contains("visible");
+      const maxAnchorRight = Math.max(...rightItems.map((i) => i.ax));
+      let rightX = Math.max(width * 0.58, maxAnchorRight + 85);
+      rightX = Math.min(rightX, width - 245);
+      rightX = Math.max(width * 0.52, rightX);
+
+      // Relax vertically to completely prevent label overlapping
+      // If part card is open, push starting Y down so tags don't collide with card
+      let curY = isCardOpen ? Math.max(340, rightItems[0].ay) : Math.max(85, rightItems[0].ay - 20);
+      rightItems.forEach((it) => {
+        it.labelX = rightX;
+        it.labelY = Math.max(curY, it.ay - 16);
+        curY = it.labelY + minSpacing;
+      });
+
+      // Clamp bottom against HUD panel
+      const lastRight = rightItems[rightItems.length - 1];
+      if (lastRight && lastRight.labelY > height - 135) {
+        const overflow = lastRight.labelY - (height - 135);
+        rightItems.forEach((it) => {
+          it.labelY = Math.max(isCardOpen ? 300 : 80, it.labelY - overflow);
+        });
+      }
+    }
+
+    // Left Flank Placement (placed to the left of the components)
+    if (leftItems.length > 0) {
+      const minAnchorLeft = Math.min(...leftItems.map((i) => i.ax));
+      let leftX = Math.min(width * 0.42 - 220, minAnchorLeft - 85 - 220);
+      leftX = Math.max(20, leftX);
+
+      // Relax vertically to completely prevent label overlapping
+      let curLeftY = Math.max(115, leftItems[0].ay - 20);
+      leftItems.forEach((it) => {
+        it.labelX = leftX;
+        it.labelY = Math.max(curLeftY, it.ay - 16);
+        curLeftY = it.labelY + minSpacing;
+      });
+
+      // Clamp bottom against HUD panel
+      const lastLeft = leftItems[leftItems.length - 1];
+      if (lastLeft && lastLeft.labelY > height - 135) {
+        const overflow = lastLeft.labelY - (height - 135);
+        leftItems.forEach((it) => {
+          it.labelY = Math.max(110, it.labelY - overflow);
+        });
+      }
+    }
+  } else {
+    // Linear Mode: Parts 1 to 8 are arrayed horizontally
+    activeItems.forEach((it, idx) => {
+      it.labelX = Math.max(20, Math.min(width - 240, it.ax - 100));
+      if (idx % 2 === 0) {
+        // Odd numbers (index 0, 2, 4, 6) placed above the parts
+        let topY = it.ay - 88;
+        // Avoid spec-banner at top-left
+        if (it.labelX < 360 && topY < 130) {
+          topY = 130;
+        }
+        it.labelY = Math.max(80, topY);
+      } else {
+        // Even numbers (index 1, 3, 5, 7) placed below the parts
+        it.labelY = Math.min(height - 165, it.ay + 80);
+      }
+    });
+  }
+
+  // Render DOM positions and update SVG Leader Lines
+  activeItems.forEach((entry) => {
+    const { ax, ay, el, key, labelX, labelY } = entry;
+    el.style.left = `${labelX.toFixed(1)}px`;
+    el.style.top = `${labelY.toFixed(1)}px`;
     el.classList.add("visible");
+
+    const leader = leaderElements.get(key);
+    if (!leader) return;
+
+    leader.g.style.display = "block";
+    leader.anchorCircle.setAttribute("cx", ax.toFixed(1));
+    leader.anchorCircle.setAttribute("cy", ay.toFixed(1));
+    leader.pulseCircle.setAttribute("cx", ax.toFixed(1));
+    leader.pulseCircle.setAttribute("cy", ay.toFixed(1));
+
+    const tagMidY = labelY + 18;
+    const tagWidth = el.offsetWidth || 215;
+
+    if (explodeMode === "3d") {
+      if (labelX > ax) {
+        // Right Flank: Leader line goes from anchor (ax, ay) to left edge of tag
+        const elbowX = ax + (labelX - ax) * 0.45;
+        leader.path.setAttribute(
+          "d",
+          `M ${ax.toFixed(1)} ${ay.toFixed(1)} L ${elbowX.toFixed(1)} ${tagMidY.toFixed(1)} L ${labelX.toFixed(1)} ${tagMidY.toFixed(1)}`
+        );
+      } else {
+        // Left Flank: Leader line goes from anchor (ax, ay) to right edge of tag
+        const badgeRight = labelX + tagWidth;
+        const elbowX = badgeRight + (ax - badgeRight) * 0.55;
+        leader.path.setAttribute(
+          "d",
+          `M ${ax.toFixed(1)} ${ay.toFixed(1)} L ${elbowX.toFixed(1)} ${tagMidY.toFixed(1)} L ${badgeRight.toFixed(1)} ${tagMidY.toFixed(1)}`
+        );
+      }
+    } else {
+      // Linear Mode: Stepped vertical leader line
+      const tagMidX = labelX + tagWidth / 2;
+      const isAbove = labelY < ay;
+      const targetY = isAbove ? labelY + 36 : labelY;
+      const elbowY = ay + (targetY - ay) * 0.5;
+      leader.path.setAttribute(
+        "d",
+        `M ${ax.toFixed(1)} ${ay.toFixed(1)} L ${ax.toFixed(1)} ${elbowY.toFixed(1)} L ${tagMidX.toFixed(1)} ${elbowY.toFixed(1)} L ${tagMidX.toFixed(1)} ${targetY.toFixed(1)}`
+      );
+    }
   });
 }
 
@@ -1080,10 +1296,27 @@ function animate() {
     card.userData.part8.userData.rearFan.userData.bladeGroup.rotation.y -= 0.024;
   }
 
-  // Raycasting
+  // Raycasting & Bidirectional Hover Highlight
   raycaster.setFromCamera(pointer, camera);
   const intersections = raycaster.intersectObjects(interactiveMeshes, false);
   canvas.style.cursor = intersections.length ? "pointer" : "grab";
+
+  let meshHoveredKey = null;
+  if (intersections.length > 0) {
+    let curr = intersections[0].object;
+    while (curr && curr.parent && curr !== card) {
+      if (curr.userData && curr.userData.partKey) {
+        meshHoveredKey = curr.userData.partKey;
+        break;
+      }
+      curr = curr.parent;
+    }
+  }
+
+  if (meshHoveredKey !== hoveredPartKey) {
+    hoveredPartKey = meshHoveredKey;
+    updateLeaderHighlight();
+  }
 
   renderer.render(scene, camera);
 }

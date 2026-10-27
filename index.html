@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#121316" />
     <title>NVIDIA GeForce RTX 4090 Founders Edition — 3D Exploded View</title>
-    <link rel="stylesheet" href="./styles.css?v=6" />
+    <link rel="stylesheet" href="./styles.css?v=10" />
   </head>
   <body>
     <main id="scene-container" aria-label="Interactive NVIDIA GeForce RTX 4090 Founders Edition 3D visualization">
@@ -44,11 +44,13 @@
         </div>
       </header>
 
-      <!-- 3D Callout Badges Layer (Projected from 3D world space) -->
+      <!-- 3D Callout Badges Layer & Leader Lines (Projected from 3D world space) -->
       <div id="callout-overlay" aria-hidden="true">
+        <svg id="callout-lines" class="callout-lines-layer" xmlns="http://www.w3.org/2000/svg"></svg>
+
         <div class="callout-tag" id="tagFrontShroud" data-part="frontShroud">
           <span class="callout-num">1</span>
-          <div>
+          <div class="callout-content">
             <div class="callout-text">Front Shroud</div>
             <div class="callout-sub">Hourglass X-Frame & RTX 4090</div>
           </div>
@@ -56,7 +58,7 @@
 
         <div class="callout-tag" id="tagFrontFan" data-part="frontFan">
           <span class="callout-num">2</span>
-          <div>
+          <div class="callout-content">
             <div class="callout-text">Axial Fan</div>
             <div class="callout-sub">120mm Fluid Bearing Intake</div>
           </div>
@@ -64,7 +66,7 @@
 
         <div class="callout-tag" id="tagFanFrame" data-part="fanFrame">
           <span class="callout-num">3</span>
-          <div>
+          <div class="callout-content">
             <div class="callout-text">Fan Frame</div>
             <div class="callout-sub">Structural Cast Bracket</div>
           </div>
@@ -72,7 +74,7 @@
 
         <div class="callout-tag" id="tagHeatsink" data-part="heatsink">
           <span class="callout-num">4</span>
-          <div>
+          <div class="callout-content">
             <div class="callout-text">Heatsink & Heat Pipes</div>
             <div class="callout-sub">Vapor Chamber & 64 Fins</div>
           </div>
@@ -80,7 +82,7 @@
 
         <div class="callout-tag" id="tagPcb" data-part="pcb">
           <span class="callout-num">5</span>
-          <div>
+          <div class="callout-content">
             <div class="callout-text">PCB (GPU + VRAM + VRM)</div>
             <div class="callout-sub">AD102 Core & 24GB GDDR6X</div>
           </div>
@@ -88,7 +90,7 @@
 
         <div class="callout-tag" id="tagThermalPlate" data-part="thermalPlate">
           <span class="callout-num">6</span>
-          <div>
+          <div class="callout-content">
             <div class="callout-text">Thermal Plate</div>
             <div class="callout-sub">Die-Cast Stiffener Frame</div>
           </div>
@@ -96,7 +98,7 @@
 
         <div class="callout-tag" id="tagBackplate" data-part="backplate">
           <span class="callout-num">7</span>
-          <div>
+          <div class="callout-content">
             <div class="callout-text">Backplate</div>
             <div class="callout-sub">Anodized Alloy & X-Bracket</div>
           </div>
@@ -104,7 +106,7 @@
 
         <div class="callout-tag" id="tagRearShroud" data-part="rearShroud">
           <span class="callout-num">8</span>
-          <div>
+          <div class="callout-content">
             <div class="callout-text">Rear Shroud & Fan</div>
             <div class="callout-sub">Flow-Through Exhaust System</div>
           </div>
@@ -231,6 +233,6 @@
         }
       }
     </script>
-    <script type="module" src="./main.js?v=9"></script>
+    <script type="module" src="./main.js?v=10"></script>
   </body>
 </html>
