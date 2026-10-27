@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>Graphics Card — Clean Product View</title>
+    <link rel="stylesheet" href="./styles.css?v=4" />
+  </head>
+  <body>
+    <main id="scene-container" aria-label="Interactive graphics card product view">
+      <div class="scene-loader" id="sceneLoader">LOADING PRODUCT VIEW</div>
+      <canvas id="scene-canvas"></canvas>
+    </main>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js"
+        }
+      }
+    </script>
+    <script type="module" src="./main.js?v=7"></script>
+  </body>
+</html>
