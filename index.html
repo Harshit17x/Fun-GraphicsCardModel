@@ -5,14 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#121316" />
     <title>NVIDIA GeForce RTX 4090 Founders Edition — 3D Exploded View</title>
-    <link rel="stylesheet" href="./styles.css?v=11" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css?v=13" />
   </head>
   <body>
     <main id="scene-container" aria-label="Interactive NVIDIA GeForce RTX 4090 Founders Edition 3D visualization">
       <!-- Loading Overlay -->
       <div class="scene-loader" id="sceneLoader">
         <div class="spinner"></div>
-        <span>INITIALIZING RTX 4090 FOUNDERS EDITION</span>
+        <span>Loading RTX 4090 3D Model...</span>
       </div>
 
       <!-- Top Information Bar -->
@@ -33,7 +36,7 @@
             </button>
             <button id="btnModeLinear" class="chip-btn" title="Linear Blueprint Explode (1 to 8)">
               <span class="chip-icon">⇥</span>
-              <span class="chip-text">Linear (1–8)</span>
+              <span class="chip-text">Linear View</span>
             </button>
           </div>
 
@@ -48,7 +51,7 @@
       <div class="focus-mode-banner" id="focusModeBanner" aria-live="polite">
         <div class="focus-banner-left">
           <div class="focus-pulse-dot"></div>
-          <span class="focus-badge">3D HERO FOCUS</span>
+          <span class="focus-badge">Component Focus</span>
           <span class="focus-title" id="focusTitle">Component Name</span>
         </div>
         <div class="focus-banner-actions">
@@ -58,7 +61,7 @@
           </button>
           <button class="focus-action-btn btn-exit-focus" id="btnExitFocus" title="Return to Overview (Esc)">
             <span class="focus-btn-icon">✕</span>
-            <span>Return to Full Card</span>
+            <span>Return to Overview</span>
             <kbd>Esc</kbd>
           </button>
         </div>
@@ -103,15 +106,15 @@
         <div class="callout-tag" id="tagPcb" data-part="pcb">
           <span class="callout-num">5</span>
           <div class="callout-content">
-            <div class="callout-text">PCB (GPU + VRAM + VRM)</div>
-            <div class="callout-sub">AD102 Core & 24GB GDDR6X</div>
+            <div class="callout-text">PCB & GPU Core</div>
+            <div class="callout-sub">AD102 Die & 24GB GDDR6X</div>
           </div>
         </div>
 
         <div class="callout-tag" id="tagThermalPlate" data-part="thermalPlate">
           <span class="callout-num">6</span>
           <div class="callout-content">
-            <div class="callout-text">Thermal Plate</div>
+            <div class="callout-text">Thermal Midplate</div>
             <div class="callout-sub">Die-Cast Stiffener Frame</div>
           </div>
         </div>
@@ -136,11 +139,11 @@
       <!-- Component Technical Specification Card -->
       <aside class="part-card" id="partCard" aria-label="Component specifications">
         <div class="part-card-header">
-          <div class="part-card-badge" id="partCardBadge">PART 01</div>
+          <div class="part-card-badge" id="partCardBadge">Part 1</div>
           <button class="part-card-close" id="partCardClose" aria-label="Close card">&times;</button>
         </div>
-        <h2 class="part-card-title" id="partCardTitle">Component Specs</h2>
-        <p class="part-card-body" id="partCardBody">Click any numbered component to view authentic engineering parameters.</p>
+        <h2 class="part-card-title" id="partCardTitle">Component Specifications</h2>
+        <p class="part-card-body" id="partCardBody">Select any component to view detailed engineering parameters.</p>
         
         <div class="part-card-stats" id="partCardStats">
           <div class="stat-item">
@@ -156,13 +159,13 @@
             <span class="stat-value" id="statDimensions">-</span>
           </div>
           <div class="stat-item">
-            <span class="stat-label">Cooling / Power</span>
+            <span class="stat-label">Cooling & Power</span>
             <span class="stat-value" id="statCooling">-</span>
           </div>
         </div>
         <div class="part-card-footer">
-          <button id="btnCardExitFocus" class="card-focus-return-btn" title="Return to Full Card (Esc)">
-            <span>←</span> Return to Full Model
+          <button id="btnCardExitFocus" class="card-focus-return-btn" title="Return to Overview (Esc)">
+            <span>←</span> Return to Overview
           </button>
         </div>
       </aside>
@@ -193,7 +196,7 @@
 
             <!-- Explosion Distance Slider -->
             <div class="slider-group">
-              <span class="slider-label">Deconstruct</span>
+              <span class="slider-label">Explosion</span>
               <input 
                 type="range" 
                 id="explodeSlider" 
@@ -238,17 +241,15 @@
 
         <!-- Keyboard hotkey shortcuts -->
         <div class="hotkey-hints">
-          <span><kbd>Space</kbd> / <kbd>E</kbd> Explode</span>
+          <span><kbd>Space</kbd> Explode</span>
           <span>&bull;</span>
-          <span><kbd>Click</kbd> / <kbd>1</kbd>–<kbd>8</kbd> 3D Inspect</span>
+          <span><kbd>Click</kbd> / <kbd>1</kbd>–<kbd>8</kbd> Focus Part</span>
           <span>&bull;</span>
           <span><kbd>Esc</kbd> Exit Focus</span>
           <span>&bull;</span>
           <span><kbd>M</kbd> Mode</span>
           <span>&bull;</span>
           <span><kbd>R</kbd> Reset</span>
-          <span>&bull;</span>
-          <span><kbd>Drag</kbd> Orbit</span>
         </div>
       </div>
     </main>
@@ -260,6 +261,6 @@
         }
       }
     </script>
-    <script type="module" src="./main.js?v=11"></script>
+    <script type="module" src="./main.js?v=13"></script>
   </body>
 </html>

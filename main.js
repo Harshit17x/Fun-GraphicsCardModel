@@ -164,13 +164,12 @@ function createRtx4090Texture() {
 
   // Laser-etched RTX 4090 logo
   ctx.fillStyle = "#e2e5e9";
-  ctx.font = "700 110px 'Inter', sans-serif";
+  ctx.font = "700 100px -apple-system, BlinkMacSystemFont, 'Inter', sans-serif";
   ctx.fillText("RTX 4090", 110, 260);
 
-  ctx.fillStyle = "#7a828e";
-  ctx.font = "600 28px 'Inter', sans-serif";
-  ctx.letterSpacing = "0.2em";
-  ctx.fillText("FOUNDERS EDITION • 24 GB", 112, 320);
+  ctx.fillStyle = "#8a92a0";
+  ctx.font = "500 28px -apple-system, BlinkMacSystemFont, 'Inter', sans-serif";
+  ctx.fillText("Founders Edition • 24 GB GDDR6X", 112, 318);
 
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -187,9 +186,8 @@ function createGeforceLogoTexture() {
 
   // White illuminated logo
   ctx.fillStyle = "#ffffff";
-  ctx.font = "800 62px 'Inter', sans-serif";
-  ctx.letterSpacing = "0.08em";
-  ctx.fillText("GEFORCE RTX", 60, 86);
+  ctx.font = "700 56px -apple-system, BlinkMacSystemFont, 'Inter', sans-serif";
+  ctx.fillText("GEFORCE RTX", 60, 84);
 
   // Green accent bar
   ctx.fillStyle = "#76b900";
@@ -243,15 +241,15 @@ function createGpuDieTexture() {
 
   // Typography
   ctx.fillStyle = "#ffffff";
-  ctx.font = "800 68px 'Inter', sans-serif";
+  ctx.font = "700 64px -apple-system, BlinkMacSystemFont, 'Inter', sans-serif";
   ctx.textAlign = "center";
   ctx.fillText("NVIDIA", 512, 590);
 
   ctx.fillStyle = "#9ca3af";
-  ctx.font = "600 32px 'Inter', sans-serif";
-  ctx.fillText("AD102-300-A1", 512, 650);
-  ctx.font = "500 24px 'Inter', sans-serif";
-  ctx.fillText("ADA LOVELACE • TSMC 4N", 512, 700);
+  ctx.font = "500 30px -apple-system, BlinkMacSystemFont, 'Inter', sans-serif";
+  ctx.fillText("AD102-300-A1", 512, 648);
+  ctx.font = "400 24px -apple-system, BlinkMacSystemFont, 'Inter', sans-serif";
+  ctx.fillText("Ada Lovelace Architecture", 512, 696);
 
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -966,8 +964,8 @@ function resizeRenderer() {
 // ---------------- Technical Specifications (Authentic RTX 4090 Data) ----------------
 const partData = {
   frontShroud: {
-    num: "PART 01",
-    title: "1. Front Shroud & Hourglass X-Frame",
+    num: "Part 1",
+    title: "Front Shroud & X-Frame",
     desc: "Unibody champagne-gold anodized aluminum perimeter frame with radiused corners, matte black left face, and circular intake duct for the front axial fan.",
     material: "CNC Extruded Aluminum Alloy (Anodized Champagne)",
     arch: "NVIDIA Dual Axial Flow-Through Shroud",
@@ -975,8 +973,8 @@ const partData = {
     cooling: "Active Front Intake Guide Channel",
   },
   frontFan: {
-    num: "PART 02",
-    title: "2. Front Axial Flow Fan (Intake)",
+    num: "Part 2",
+    title: "Axial Flow Intake Fan",
     desc: "120mm counter-rotating axial fan with 7 aerodynamic swept blades connected by an outer stabilizer duct ring and spun-finish metallic center spinner.",
     material: "Reinforced Polycarbonate & Metallic Cap",
     arch: "Fluid Dynamic Bearing (FDB) Brushless Motor",
@@ -984,8 +982,8 @@ const partData = {
     cooling: "Pulls High-Velocity Cool Air Across Radiator",
   },
   fanFrame: {
-    num: "PART 03",
-    title: "3. Structural Cast Fan Frame",
+    num: "Part 3",
+    title: "Cast Fan Frame",
     desc: "Die-cast aluminum internal mounting bracket with triangular aerodynamic motor support struts and integrated vibration isolation dampeners.",
     material: "Die-Cast A380 Aluminum",
     arch: "Tri-Strut Motor Retention Armature",
@@ -993,8 +991,8 @@ const partData = {
     cooling: "Optimized Air Turbulence Minimization",
   },
   heatsink: {
-    num: "PART 04",
-    title: "4. Massive Heatsink & Heat Pipes",
+    num: "Part 4",
+    title: "Vapor Chamber Heatsink",
     desc: "Massive dual radiator core with 64 ultra-fine dark aluminum cooling fins, nickel-plated vapor chamber baseplate, and 4 looped sintered copper heat pipes.",
     material: "Alloy 1050 Stamped Fins & Sintered Copper",
     arch: "Dual-Stack Vapor Chamber Cooling Engine",
@@ -1002,8 +1000,8 @@ const partData = {
     cooling: "Dissipates up to 450W - 600W Total TDP",
   },
   pcb: {
-    num: "PART 05",
-    title: "5. Compact V-Notched PCB (GPU + VRAM)",
+    num: "Part 5",
+    title: "Compact V-Notched PCB",
     desc: "14-layer server-grade compact PCB featuring the NVIDIA AD102-300-A1 silicon die, 24 GB GDDR6X Micron memory, and 23-phase DrMOS power stages.",
     material: "High-TG FR-4 Epoxy & 2oz Copper Traces",
     arch: "Ada Lovelace AD102 (16,384 CUDA Cores / 76.3B Transistors)",
@@ -1011,8 +1009,8 @@ const partData = {
     cooling: "Direct Vapor Chamber & Thermal Pad Contact",
   },
   thermalPlate: {
-    num: "PART 06",
-    title: "6. Die-Cast Thermal Midplate",
+    num: "Part 6",
+    title: "Die-Cast Thermal Midplate",
     desc: "Precision structural aluminum midframe providing torsional anti-sag rigidity and dual-sided thermal dissipation pads for VRAM and MOSFET power stages.",
     material: "Die-Cast Aluminum with Silicone Thermal Pads",
     arch: "Full-Board Stiffener & Heat Spreader",
@@ -1020,8 +1018,8 @@ const partData = {
     cooling: "Transfers VRAM & VRM Heat to Main Heatsink",
   },
   backplate: {
-    num: "PART 07",
-    title: "7. Reinforced Backplate & X-Bracket",
+    num: "Part 7",
+    title: "Reinforced Backplate",
     desc: "Anodized obsidian aluminum backplate with stamped X-truss reinforcement lines, countersunk perimeter screws, and spring-steel GPU retention X-clamp.",
     material: "Anodized 6061-T6 Aluminum & Spring Steel",
     arch: "Structural Rigid Armor & Flow-Through Vents",
@@ -1029,8 +1027,8 @@ const partData = {
     cooling: "Passive Back Radiation & Socket Clamping",
   },
   rearShroud: {
-    num: "PART 08",
-    title: "8. Rear Shroud & Exhaust Fan",
+    num: "Part 8",
+    title: "Rear Shroud & Exhaust Fan",
     desc: "Rear unibody housing with parallel fin exhaust grilles and the second 120mm axial exhaust fan, pulling air through the card and exhausting directly upward.",
     material: "Anodized Champagne Aluminum & FDB Fan",
     arch: "Patented Flow-Through Rear Exhaust Architecture",
@@ -1038,8 +1036,8 @@ const partData = {
     cooling: "Pushes Hot Air Out Top/Back of Chassis",
   },
   bracket: {
-    num: "I/O PORT",
-    title: "Stainless Steel 3-Slot I/O Bracket",
+    num: "I/O Ports",
+    title: "Stainless Steel I/O Bracket",
     desc: "Rigid stainless steel chassis mounting bracket featuring hexagonal flow exhaust cutouts, 3x DisplayPort 2.1 outputs, and 1x HDMI 2.1a port.",
     material: "Stamped Stainless Steel (AISI 304)",
     arch: "Triple-Slot Rigid Chassis Mount",
@@ -1047,8 +1045,8 @@ const partData = {
     cooling: "Passive High-Velocity Hexagonal Vent",
   },
   pcie: {
-    num: "BUS INTERFACE",
-    title: "PCIe 4.0 x16 Gold Finger Connector",
+    num: "PCIe",
+    title: "PCIe 4.0 x16 Interface",
     desc: "High-bandwidth 16-lane peripheral component interface with 30 micro-inch electroplated hard gold contacts supporting up to 64 GB/s bi-directional throughput.",
     material: "FR-4 PCB with Hard Gold Electroplate",
     arch: "PCI Express Gen 4.0 x16 Signaling",
@@ -1056,8 +1054,8 @@ const partData = {
     cooling: "Direct Motherboard Bus Interface",
   },
   power: {
-    num: "POWER INLET",
-    title: "16-Pin 12VHPWR Connector & Logo",
+    num: "Power",
+    title: "16-Pin 12VHPWR Connector",
     desc: "Side-mounted ATX 3.0 PCIe 5.0 12VHPWR power connector rated for 600W sustained delivery, accompanied by the signature white-illuminated GEFORCE RTX logo plate.",
     material: "High-Temp Polyamide & Gold-Plated Terminals",
     arch: "12 Power + 4 Sideband Sense Pins (600W)",
