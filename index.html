@@ -3,16 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#ffffff" />
-    <title>BLACKOUT RTX — Interactive 3D Exploded View</title>
-    <link rel="stylesheet" href="./styles.css?v=5" />
+    <meta name="theme-color" content="#121316" />
+    <title>NVIDIA GeForce RTX 4090 Founders Edition — 3D Exploded View</title>
+    <link rel="stylesheet" href="./styles.css?v=6" />
   </head>
   <body>
-    <main id="scene-container" aria-label="Interactive graphics card product view">
+    <main id="scene-container" aria-label="Interactive NVIDIA GeForce RTX 4090 Founders Edition 3D visualization">
       <!-- Loading Overlay -->
       <div class="scene-loader" id="sceneLoader">
         <div class="spinner"></div>
-        <span>INITIALIZING PRODUCT VIEW</span>
+        <span>INITIALIZING RTX 4090 FOUNDERS EDITION</span>
       </div>
 
       <!-- Top Information Bar -->
@@ -20,12 +20,23 @@
         <div class="brand-badge">
           <div class="brand-logo-dot"></div>
           <div class="brand-meta">
-            <span class="brand-title">BLACKOUT RTX Concept</span>
-            <span class="brand-subtitle">24 GB GDDR6X • Triple 92mm Fan</span>
+            <span class="brand-title">NVIDIA GeForce RTX 4090</span>
+            <span class="brand-subtitle">Founders Edition • 24 GB GDDR6X • Ada Lovelace AD102</span>
           </div>
         </div>
 
         <div class="top-actions">
+          <div class="mode-switch-group">
+            <button id="btnMode3D" class="chip-btn active" title="3D Layered Depth Explode">
+              <span class="chip-icon">⇪</span>
+              <span class="chip-text">3D Stack</span>
+            </button>
+            <button id="btnModeLinear" class="chip-btn" title="Linear Blueprint Explode (1 to 8)">
+              <span class="chip-icon">⇥</span>
+              <span class="chip-text">Linear (1–8)</span>
+            </button>
+          </div>
+
           <button id="btnAutoRotate" class="chip-btn" aria-label="Toggle Auto Rotation">
             <span class="chip-icon">⟳</span>
             <span class="chip-text">Auto Orbit</span>
@@ -33,53 +44,69 @@
         </div>
       </header>
 
-      <!-- 3D Callout Badges Layer (Screen overlay projected from 3D space) -->
+      <!-- 3D Callout Badges Layer (Projected from 3D world space) -->
       <div id="callout-overlay" aria-hidden="true">
-        <div class="callout-tag" id="tagShroud" data-part="shroud">
-          <span class="callout-dot"></span>
+        <div class="callout-tag" id="tagFrontShroud" data-part="frontShroud">
+          <span class="callout-num">1</span>
           <div>
-            <div class="callout-text">Tri-Fan Shroud</div>
-            <div class="callout-sub">3x 92mm Axial Array</div>
+            <div class="callout-text">Front Shroud</div>
+            <div class="callout-sub">Hourglass X-Frame & RTX 4090</div>
+          </div>
+        </div>
+
+        <div class="callout-tag" id="tagFrontFan" data-part="frontFan">
+          <span class="callout-num">2</span>
+          <div>
+            <div class="callout-text">Axial Fan</div>
+            <div class="callout-sub">120mm Fluid Bearing Intake</div>
+          </div>
+        </div>
+
+        <div class="callout-tag" id="tagFanFrame" data-part="fanFrame">
+          <span class="callout-num">3</span>
+          <div>
+            <div class="callout-text">Fan Frame</div>
+            <div class="callout-sub">Structural Cast Bracket</div>
           </div>
         </div>
 
         <div class="callout-tag" id="tagHeatsink" data-part="heatsink">
-          <span class="callout-dot"></span>
+          <span class="callout-num">4</span>
           <div>
-            <div class="callout-text">Radiator Fin Stack</div>
-            <div class="callout-sub">58 Fins & Sintered Heat Pipe</div>
+            <div class="callout-text">Heatsink & Heat Pipes</div>
+            <div class="callout-sub">Vapor Chamber & 64 Fins</div>
           </div>
         </div>
 
         <div class="callout-tag" id="tagPcb" data-part="pcb">
-          <span class="callout-dot"></span>
+          <span class="callout-num">5</span>
           <div>
-            <div class="callout-text">PCB & GPU Die</div>
-            <div class="callout-sub">Silicon Core & 12x VRAM ICs</div>
+            <div class="callout-text">PCB (GPU + VRAM + VRM)</div>
+            <div class="callout-sub">AD102 Core & 24GB GDDR6X</div>
+          </div>
+        </div>
+
+        <div class="callout-tag" id="tagThermalPlate" data-part="thermalPlate">
+          <span class="callout-num">6</span>
+          <div>
+            <div class="callout-text">Thermal Plate</div>
+            <div class="callout-sub">Die-Cast Stiffener Frame</div>
           </div>
         </div>
 
         <div class="callout-tag" id="tagBackplate" data-part="backplate">
-          <span class="callout-dot"></span>
+          <span class="callout-num">7</span>
           <div>
-            <div class="callout-text">Armored Backplate</div>
-            <div class="callout-sub">Brushed Aluminum Alloy</div>
+            <div class="callout-text">Backplate</div>
+            <div class="callout-sub">Anodized Alloy & X-Bracket</div>
           </div>
         </div>
 
-        <div class="callout-tag" id="tagBracket" data-part="bracket">
-          <span class="callout-dot"></span>
+        <div class="callout-tag" id="tagRearShroud" data-part="rearShroud">
+          <span class="callout-num">8</span>
           <div>
-            <div class="callout-text">I/O Bracket</div>
-            <div class="callout-sub">3x DisplayPort & Exhaust Ports</div>
-          </div>
-        </div>
-
-        <div class="callout-tag" id="tagConnector" data-part="connector">
-          <span class="callout-dot"></span>
-          <div>
-            <div class="callout-text">PCIe 4.0 Interface</div>
-            <div class="callout-sub">14-Pin Gold Finger Contacts</div>
+            <div class="callout-text">Rear Shroud & Fan</div>
+            <div class="callout-sub">Flow-Through Exhaust System</div>
           </div>
         </div>
       </div>
@@ -87,26 +114,47 @@
       <!-- Component Technical Specification Card -->
       <aside class="part-card" id="partCard" aria-label="Component specifications">
         <div class="part-card-header">
-          <h2 class="part-card-title" id="partCardTitle">Component Specs</h2>
+          <div class="part-card-badge" id="partCardBadge">PART 01</div>
           <button class="part-card-close" id="partCardClose" aria-label="Close card">&times;</button>
         </div>
-        <p class="part-card-body" id="partCardBody">Click any component tag to view detailed engineering parameters.</p>
+        <h2 class="part-card-title" id="partCardTitle">Component Specs</h2>
+        <p class="part-card-body" id="partCardBody">Click any numbered component to view authentic engineering parameters.</p>
+        
         <div class="part-card-stats" id="partCardStats">
           <div class="stat-item">
             <span class="stat-label">Material</span>
             <span class="stat-value" id="statMaterial">-</span>
           </div>
           <div class="stat-item">
-            <span class="stat-label">Function</span>
+            <span class="stat-label">Architecture</span>
             <span class="stat-value" id="statFunction">-</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Dimensions</span>
+            <span class="stat-value" id="statDimensions">-</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Cooling / Power</span>
+            <span class="stat-value" id="statCooling">-</span>
           </div>
         </div>
       </aside>
 
+      <!-- Dimension Overlay Box (Toggleable Reference overlay) -->
+      <div class="spec-banner">
+        <span>304 mm (Length)</span>
+        <span>•</span>
+        <span>137 mm (Height)</span>
+        <span>•</span>
+        <span>61 mm (3-Slot Width)</span>
+        <span>•</span>
+        <span>450W TDP</span>
+      </div>
+
       <!-- WebGL Canvas -->
       <canvas id="scene-canvas"></canvas>
 
-      <!-- Bottom Interactive Control Center -->
+      <!-- Bottom Interactive Control Center (HUD) -->
       <div class="bottom-dock">
         <div class="hud-panel">
           <div class="hud-main-row">
@@ -141,6 +189,18 @@
               <button class="preset-btn" data-preset="100">Exploded</button>
             </div>
 
+            <!-- Numbered Part Quick-Selector Strip (1 to 8) -->
+            <div class="parts-quick-strip">
+              <button class="part-pill" data-part="frontShroud" title="1. Front Shroud">1</button>
+              <button class="part-pill" data-part="frontFan" title="2. Axial Fan">2</button>
+              <button class="part-pill" data-part="fanFrame" title="3. Fan Frame">3</button>
+              <button class="part-pill" data-part="heatsink" title="4. Heatsink">4</button>
+              <button class="part-pill" data-part="pcb" title="5. PCB">5</button>
+              <button class="part-pill" data-part="thermalPlate" title="6. Thermal Plate">6</button>
+              <button class="part-pill" data-part="backplate" title="7. Backplate">7</button>
+              <button class="part-pill" data-part="rearShroud" title="8. Rear Shroud">8</button>
+            </div>
+
             <div class="util-group">
               <button id="btnResetView" class="util-btn" title="Reset Camera and View">
                 <span>↺</span> Reset View
@@ -153,11 +213,13 @@
         <div class="hotkey-hints">
           <span><kbd>Space</kbd> / <kbd>E</kbd> Explode</span>
           <span>&bull;</span>
+          <span><kbd>1</kbd>–<kbd>8</kbd> Inspect Parts</span>
+          <span>&bull;</span>
+          <span><kbd>M</kbd> Explode Mode</span>
+          <span>&bull;</span>
           <span><kbd>R</kbd> Reset</span>
           <span>&bull;</span>
           <span><kbd>Drag</kbd> Orbit</span>
-          <span>&bull;</span>
-          <span><kbd>Scroll</kbd> Zoom</span>
         </div>
       </div>
     </main>
@@ -169,6 +231,6 @@
         }
       }
     </script>
-    <script type="module" src="./main.js?v=8"></script>
+    <script type="module" src="./main.js?v=9"></script>
   </body>
 </html>
