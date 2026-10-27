@@ -4,13 +4,162 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#ffffff" />
-    <title>Graphics Card — Clean Product View</title>
-    <link rel="stylesheet" href="./styles.css?v=4" />
+    <title>BLACKOUT RTX — Interactive 3D Exploded View</title>
+    <link rel="stylesheet" href="./styles.css?v=5" />
   </head>
   <body>
     <main id="scene-container" aria-label="Interactive graphics card product view">
-      <div class="scene-loader" id="sceneLoader">LOADING PRODUCT VIEW</div>
+      <!-- Loading Overlay -->
+      <div class="scene-loader" id="sceneLoader">
+        <div class="spinner"></div>
+        <span>INITIALIZING PRODUCT VIEW</span>
+      </div>
+
+      <!-- Top Information Bar -->
+      <header class="top-bar">
+        <div class="brand-badge">
+          <div class="brand-logo-dot"></div>
+          <div class="brand-meta">
+            <span class="brand-title">BLACKOUT RTX Concept</span>
+            <span class="brand-subtitle">24 GB GDDR6X • Triple 92mm Fan</span>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <button id="btnAutoRotate" class="chip-btn" aria-label="Toggle Auto Rotation">
+            <span class="chip-icon">⟳</span>
+            <span class="chip-text">Auto Orbit</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- 3D Callout Badges Layer (Screen overlay projected from 3D space) -->
+      <div id="callout-overlay" aria-hidden="true">
+        <div class="callout-tag" id="tagShroud" data-part="shroud">
+          <span class="callout-dot"></span>
+          <div>
+            <div class="callout-text">Tri-Fan Shroud</div>
+            <div class="callout-sub">3x 92mm Axial Array</div>
+          </div>
+        </div>
+
+        <div class="callout-tag" id="tagHeatsink" data-part="heatsink">
+          <span class="callout-dot"></span>
+          <div>
+            <div class="callout-text">Radiator Fin Stack</div>
+            <div class="callout-sub">58 Fins & Sintered Heat Pipe</div>
+          </div>
+        </div>
+
+        <div class="callout-tag" id="tagPcb" data-part="pcb">
+          <span class="callout-dot"></span>
+          <div>
+            <div class="callout-text">PCB & GPU Die</div>
+            <div class="callout-sub">Silicon Core & 12x VRAM ICs</div>
+          </div>
+        </div>
+
+        <div class="callout-tag" id="tagBackplate" data-part="backplate">
+          <span class="callout-dot"></span>
+          <div>
+            <div class="callout-text">Armored Backplate</div>
+            <div class="callout-sub">Brushed Aluminum Alloy</div>
+          </div>
+        </div>
+
+        <div class="callout-tag" id="tagBracket" data-part="bracket">
+          <span class="callout-dot"></span>
+          <div>
+            <div class="callout-text">I/O Bracket</div>
+            <div class="callout-sub">3x DisplayPort & Exhaust Ports</div>
+          </div>
+        </div>
+
+        <div class="callout-tag" id="tagConnector" data-part="connector">
+          <span class="callout-dot"></span>
+          <div>
+            <div class="callout-text">PCIe 4.0 Interface</div>
+            <div class="callout-sub">14-Pin Gold Finger Contacts</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Component Technical Specification Card -->
+      <aside class="part-card" id="partCard" aria-label="Component specifications">
+        <div class="part-card-header">
+          <h2 class="part-card-title" id="partCardTitle">Component Specs</h2>
+          <button class="part-card-close" id="partCardClose" aria-label="Close card">&times;</button>
+        </div>
+        <p class="part-card-body" id="partCardBody">Click any component tag to view detailed engineering parameters.</p>
+        <div class="part-card-stats" id="partCardStats">
+          <div class="stat-item">
+            <span class="stat-label">Material</span>
+            <span class="stat-value" id="statMaterial">-</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Function</span>
+            <span class="stat-value" id="statFunction">-</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- WebGL Canvas -->
       <canvas id="scene-canvas"></canvas>
+
+      <!-- Bottom Interactive Control Center -->
+      <div class="bottom-dock">
+        <div class="hud-panel">
+          <div class="hud-main-row">
+            <!-- Primary Explode Button -->
+            <button id="btnExplode" class="btn-explode-toggle" aria-pressed="false">
+              <span class="icon-explode">💥</span>
+              <span id="btnExplodeText">Explode View</span>
+            </button>
+
+            <!-- Explosion Distance Slider -->
+            <div class="slider-group">
+              <span class="slider-label">Deconstruct</span>
+              <input 
+                type="range" 
+                id="explodeSlider" 
+                class="explode-slider" 
+                min="0" 
+                max="100" 
+                value="0" 
+                step="1"
+                aria-label="Explosion percentage"
+              />
+              <span class="slider-value" id="explodeValue">0%</span>
+            </div>
+          </div>
+
+          <!-- Secondary Row: Presets & Utilities -->
+          <div class="hud-secondary-row">
+            <div class="preset-group">
+              <button class="preset-btn active" data-preset="0">Assembled</button>
+              <button class="preset-btn" data-preset="50">50%</button>
+              <button class="preset-btn" data-preset="100">Exploded</button>
+            </div>
+
+            <div class="util-group">
+              <button id="btnResetView" class="util-btn" title="Reset Camera and View">
+                <span>↺</span> Reset View
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Keyboard hotkey shortcuts -->
+        <div class="hotkey-hints">
+          <span><kbd>Space</kbd> / <kbd>E</kbd> Explode</span>
+          <span>&bull;</span>
+          <span><kbd>R</kbd> Reset</span>
+          <span>&bull;</span>
+          <span><kbd>Drag</kbd> Orbit</span>
+          <span>&bull;</span>
+          <span><kbd>Scroll</kbd> Zoom</span>
+        </div>
+      </div>
     </main>
 
     <script type="importmap">
@@ -20,6 +169,6 @@
         }
       }
     </script>
-    <script type="module" src="./main.js?v=7"></script>
+    <script type="module" src="./main.js?v=8"></script>
   </body>
 </html>

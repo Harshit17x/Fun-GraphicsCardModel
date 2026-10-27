@@ -14,12 +14,13 @@ Modeled procedurally after flagship triple-fan graphics cards (codenamed **"BLAC
 ## 🌟 Highlights & Features
 
 - **🎮 360° Interactive Orbit Controls**: Inspect the card from any angle with smooth damping/inertia, pan restrictions, and zoom clamping.
-- **💥 Real-Time Exploded View**: Press `E` or `Space` to separate the card into all its distinct mechanical layers using smooth vector lerp animations.
+- **💥 Real-Time Exploded View**: Click the **"Explode View"** button, scrub the **Deconstruct Slider (0%–100%)**, or press `E`/`Space` to separate the card into distinct engineering layers using smooth vector lerp animations.
+- **🏷️ Dynamic 3D Callout Badges**: Interactive screen-projected tags float directly over parts when exploded, pointing to the Shroud, Heatsink, PCB, Backplate, Bracket, and PCIe Interface.
+- **📋 Component Specification Inspector**: Click any callout tag or 3D mesh to open an interactive drawer displaying materials, dimensions, and engineering functions.
 - **🌀 Triple 92mm Axial Fan Array**: Three independently spinning cooling fans (11 curved blades each with alternating graphite textures) and pulsing RGB LED halo rings.
 - **⚡ Procedural Hardware Architecture**: Complete GPU anatomy modeled down to the GPU die, VRAM chips, copper traces, capacitors, heatsink fins, heat pipes, and gold PCIe contacts.
 - **💡 Photorealistic Studio Lighting**: Multi-point lighting setup featuring directional key lighting, subtle rim illumination, ambient hemisphere lighting, and localized red/blue accent glows with soft PCF shadow maps.
-- **🎯 Interactive Raycasting**: Real-time raycaster tracks pointer position over mesh geometries and dynamically adapts the cursor (`grab` ➔ `pointer`).
-- **🔗 URL Query Parameter Support**: Load directly into exploded view using `?view=exploded` (ideal for showcases and presentations).
+- **🔄 Auto Orbit Mode**: One-click automatic continuous rotation for showcase and presentation views.
 - **🚀 Zero Build Setup**: Pure ES modules served directly from CDN via modern browser Import Maps. No npm install, Webpack, or Vite required!
 
 ---
@@ -32,6 +33,7 @@ When toggling the **Exploded View**, the card dynamically separates into its con
 | :--- | :--- | :--- |
 | **Aerodynamic Shroud & Fans** | 8.46-unit brushed shell with dual-tone finish, carbon side trims, custom typography plates, and triple 92mm fans with glowing inner rings. | Displaces upward (`+Y, +Z`) |
 | **High-Density Heatsink** | Dual fin-stack radiator consisting of 58 individually positioned cooling fins, dual heat sink blocks, and a looping gold/copper sintered heat pipe. | Displaces upward (`+Y`) |
+| **Die-Cast Armor Midframe** | Structural perimeter stiffener with blue thermal conductivity pads for memory and VRM power modules. | Floats between heatsink & PCB |
 | **Custom Circuit Board (PCB)** | Dark teal matte solder mask, GPU silicon core with integrated heat spreader (IHS), 12 GDDR memory ICs, 13 signal bus traces, and 8 high-performance capacitors. | Centers on baseline |
 | **Structural Metal Backplate** | Rigid matte-graphite backplate with precision cutouts, 8 hex mounting screws, and laser-engraved `"BLACKOUT / 24 GB"` branding plate. | Displaces downward (`-Y, -Z`) |
 | **I/O Bracket & Display Ports** | Brushed steel dual-slot PCI bracket with 4 hexagonal exhaust vents and 3 illuminated digital display outputs (blue LED glow). | Displaces outward (`-X`) |
@@ -61,11 +63,7 @@ Python comes pre-installed on macOS and Linux, and is readily available on Windo
 
 2. Start the local HTTP server:
    ```bash
-   # Python 3
    python3 -m http.server 4173
-   
-   # Or Python 2 (if legacy)
-   python -m SimpleHTTPServer 4173
    ```
 
 3. Open your browser and navigate to:
@@ -100,13 +98,18 @@ Then visit the URL displayed in the console (usually `http://localhost:3000` or 
 
 ## 🕹️ Controls & Navigation
 
-| Input / Key | Action | Description |
+| Input / Element | Action | Description |
 | :--- | :--- | :--- |
+| **💥 "Explode View" Button** | **Toggle Explosion** | Smoothly explodes or re-assembles all GPU layers with one click. |
+| **🎚️ Deconstruct Slider** | **Continuous Scrub** | Drag from `0%` (assembled) to `100%` (fully separated) in real time. |
+| **🎯 Preset Buttons** | **Quick Jump** | Instant presets for `Assembled (0%)`, `50%`, and `Exploded (100%)`. |
+| **🏷️ 3D Callout Tags** | **Inspect Component** | Click any floating tag to view full technical specs in the side drawer. |
+| **⟳ Auto Orbit Button** | **Continuous Orbit** | Toggles smooth 360° turntable product rotation. |
+| **↺ Reset View Button** | **Camera Reset** | Re-centers camera angle, zoom distance, and closes exploded state. |
 | **Left Click + Drag** | **Orbit / Rotate** | Rotates the graphics card in 3D space with inertia damping. |
 | **Scroll Wheel / Pinch** | **Zoom In / Out** | Smoothly zooms in to examine fine details or zooms out for wide product shots. |
-| **Spacebar** or **`E`** | **Toggle Exploded View** | Separates / re-assembles the shroud, heatsink, PCB, backplate, bracket, and connectors. |
-| **`R` Key** | **Reset View** | Restores the default camera perspective, target, and assembled view state. |
-| **Mouse Hover** | **Mesh Inspection** | Raycasts interactive geometry and updates cursor to pointer. |
+| **Spacebar** or **`E`** | **Toggle Shortcut** | Keyboard toggle between assembled and exploded configurations. |
+| **`R` Key** | **Reset Shortcut** | Restores default camera angle, target, and assembled state. |
 | **URL Parameter** | **Direct Presentation** | Append `?view=exploded` to the URL to start immediately in exploded view. |
 
 ---
