@@ -10,7 +10,7 @@ const canvas = document.querySelector("#scene-canvas");
 const sceneContainer = document.querySelector("#scene-container");
 const sceneLoader = document.querySelector("#sceneLoader");
 
-// View Mode Navigation
+// View Mode Navigation (Clean Segmented Pill)
 const btnViewFacility = document.querySelector("#btnViewFacility");
 const btnViewRack = document.querySelector("#btnViewRack");
 const btnViewTray = document.querySelector("#btnViewTray");
@@ -22,7 +22,7 @@ const viewButtons = {
   gpu: btnViewGpu,
 };
 
-// Facility Action Buttons
+// Facility Action Buttons (Contextual in Rack & Blade Views)
 const btnToggleDoor = document.querySelector("#btnToggleDoor");
 const doorBtnText = document.querySelector("#doorBtnText");
 const btnToggleTray = document.querySelector("#btnToggleTray");
@@ -43,7 +43,7 @@ const camPresetButtons = {
   blade: btnCamBlade,
 };
 
-// GPU Explode Controls
+// GPU Explode Controls (Contextual in Explode GPU View)
 const btnExplode = document.querySelector("#btnExplode");
 const btnExplodeText = document.querySelector("#btnExplodeText");
 const explodeSlider = document.querySelector("#explodeSlider");
@@ -96,7 +96,6 @@ class DatacenterAudio {
     if (!AudioContextClass) return;
     this.ctx = new AudioContextClass();
 
-    // Master Gain
     this.masterGain = this.ctx.createGain();
     this.masterGain.gain.setValueAtTime(0.0001, this.ctx.currentTime);
     this.masterGain.connect(this.ctx.destination);
@@ -110,7 +109,6 @@ class DatacenterAudio {
     this.osc1.connect(osc1Gain);
     osc1Gain.connect(this.masterGain);
 
-    // 120.6Hz 2nd Harmonic with subtle phase beating
     this.osc2 = this.ctx.createOscillator();
     this.osc2.type = "sine";
     this.osc2.frequency.setValueAtTime(120.6, this.ctx.currentTime);
@@ -119,7 +117,6 @@ class DatacenterAudio {
     this.osc2.connect(osc2Gain);
     osc2Gain.connect(this.masterGain);
 
-    // Sub-harmonic 30Hz bass drone
     this.oscSub = this.ctx.createOscillator();
     this.oscSub.type = "triangle";
     this.oscSub.frequency.setValueAtTime(30.0, this.ctx.currentTime);
@@ -149,7 +146,6 @@ class DatacenterAudio {
     this.noiseNode.buffer = noiseBuffer;
     this.noiseNode.loop = true;
 
-    // Resonant lowpass airflow filter
     this.filterNode = this.ctx.createBiquadFilter();
     this.filterNode.type = "lowpass";
     this.filterNode.frequency.setValueAtTime(460, this.ctx.currentTime);
@@ -193,17 +189,17 @@ if (btnSoundToggle) {
   btnSoundToggle.addEventListener("click", () => {
     const isPlaying = audioSystem.toggle();
     if (soundIcon) soundIcon.textContent = isPlaying ? "🔊" : "🔇";
-    if (soundText) soundText.textContent = isPlaying ? "Audio: Hum Active" : "Audio: Hum Muted";
+    if (soundText) soundText.textContent = isPlaying ? "Audio On" : "Audio";
     btnSoundToggle.classList.toggle("active", isPlaying);
   });
 }
 
 // ============================================================================
-// Three.js Scene Setup (Datacenter SuperPOD & RTX 4090)
+// Three.js Scene Setup (Photorealistic Light-Themed Cleanroom Datacenter)
 // ============================================================================
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x050d1e);
-scene.fog = new THREE.FogExp2(0x050d1e, 0.011);
+scene.background = new THREE.Color(0xeef3f8);
+scene.fog = new THREE.Fog(0xdce6f2, 45, 200);
 
 const camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.1, 400);
 
@@ -216,7 +212,7 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.35;
+renderer.toneMappingExposure = 1.75;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -228,6 +224,29 @@ controls.minDistance = 1.5;
 controls.maxDistance = 220;
 controls.autoRotate = false;
 controls.autoRotateSpeed = 0.7;
+
+// Bright Cleanroom Datacenter Illumination Rig
+const ambientLight = new THREE.AmbientLight(0xffffff, 1.8);
+scene.add(ambientLight);
+
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0xc0d0e4, 1.6);
+hemiLight.position.set(0, 50, 0);
+scene.add(hemiLight);
+
+const aisleKeyLight = new THREE.DirectionalLight(0xffffff, 1.8);
+aisleKeyLight.position.set(5, 55, 30);
+aisleKeyLight.castShadow = true;
+aisleKeyLight.shadow.mapSize.set(2048, 2048);
+aisleKeyLight.shadow.bias = -0.0002;
+scene.add(aisleKeyLight);
+
+const aisleKeyLight2 = new THREE.DirectionalLight(0xf0f6ff, 1.4);
+aisleKeyLight2.position.set(-5, 55, -30);
+scene.add(aisleKeyLight2);
+
+const floorBounceLight = new THREE.DirectionalLight(0x38bdf8, 0.9);
+floorBounceLight.position.set(0, -10, 0);
+scene.add(floorBounceLight);
 
 const clock = new THREE.Clock();
 const pointer = new THREE.Vector2(0, 0);
@@ -315,13 +334,13 @@ const focusOffsets = {
   },
 };
 
-// Sleek translucent ghost material for contextual background components
+// Light theme frosted translucent ghost material for contextual background components
 const ghostMaterial = new THREE.MeshStandardMaterial({
-  color: 0x181c24,
-  roughness: 0.8,
+  color: 0x94a3b8,
+  roughness: 0.7,
   metalness: 0.1,
   transparent: true,
-  opacity: 0.16,
+  opacity: 0.22,
   depthWrite: false,
 });
 
@@ -660,10 +679,8 @@ function createPart4Heatsink(card) {
   card.add(group);
   rememberPartTransform(group, [0, 1.4, 0], [-2.0, 0, 0]);
 
-  // Vapor Chamber Baseplate
   addMesh(group, new RoundedBoxGeometry(5.2, 0.22, 4.2, 0.08, 4), palette.copper, [-1.8, -0.22, 0]);
 
-  // Left Dense Radiator Fin Stack (42 cooling fins)
   for (let i = 0; i < 42; i += 1) {
     const x = -4.5 + i * 0.11;
     const fin = new THREE.Mesh(new THREE.BoxGeometry(0.035, 1.05, 4.15), palette.finMetal);
@@ -671,7 +688,6 @@ function createPart4Heatsink(card) {
     group.add(fin);
   }
 
-  // Right Flow-Through Fin Stack (32 curved cooling fins)
   for (let i = 0; i < 32; i += 1) {
     const x = 0.5 + i * 0.13;
     const fin = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.9, 4.15), palette.finMetalDark);
@@ -679,7 +695,6 @@ function createPart4Heatsink(card) {
     group.add(fin);
   }
 
-  // 4 Continuous Sintered Copper Heat Pipes
   for (let p = 0; p < 4; p += 1) {
     const zOffset = -1.4 + p * 0.92;
     const pipe = new THREE.Mesh(
@@ -702,16 +717,10 @@ function createPart5Pcb(card) {
   card.add(group);
   rememberPartTransform(group, [-1.0, 0.2, 0], [2.0, 0, 0]);
 
-  // V-Notched Server-Grade PCB Substrate
   addMesh(group, new RoundedBoxGeometry(7.2, 0.12, 4.15, 0.08, 4), palette.pcb, [0, 0, 0]);
-
-  // AD102-300-A1 GPU Silicon Core Die
   addMesh(group, new RoundedBoxGeometry(1.68, 0.12, 1.68, 0.04, 4), palette.siliconDie, [-0.6, 0.1, 0]);
-
-  // Mirror Metal Retention Ring Frame
   addMesh(group, new THREE.BoxGeometry(1.95, 0.08, 1.95), palette.steel, [-0.6, 0.06, 0]);
 
-  // 12 Micron GDDR6X VRAM IC Modules
   const vramPositions = [
     [-1.9, 0.08, -1.2], [-1.9, 0.08, -0.4], [-1.9, 0.08, 0.4], [-1.9, 0.08, 1.2],
     [0.7, 0.08, -1.2],  [0.7, 0.08, -0.4],  [0.7, 0.08, 0.4],  [0.7, 0.08, 1.2],
@@ -722,14 +731,12 @@ function createPart5Pcb(card) {
     addMesh(group, new THREE.BoxGeometry(0.48, 0.06, 0.62), palette.vramChip, [x, y, z]);
   });
 
-  // 23-Phase DrMOS Power Stages (Inductor chokes & solid polymer capacitors)
   for (let i = 0; i < 14; i += 1) {
     const z = -1.7 + i * 0.26;
     addMesh(group, new THREE.BoxGeometry(0.32, 0.18, 0.22), palette.graphite, [1.8, 0.1, z]);
     addMesh(group, new THREE.CylinderGeometry(0.08, 0.08, 0.16, 12), palette.steel, [2.3, 0.1, z]);
   }
 
-  // Cyan bus trace conduits
   for (let t = 0; t < 6; t += 1) {
     const tr = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.02, 0.05), palette.pcbTrace);
     tr.position.set(0.6, 0.07, -1.3 + t * 0.52);
@@ -749,7 +756,6 @@ function createPart6ThermalPlate(card) {
 
   addMesh(group, new RoundedBoxGeometry(7.4, 0.16, 4.25, 0.08, 4), palette.graphiteSoft, [0, 0, 0]);
 
-  // Blue High-Conductivity Silicone Thermal Pads
   const padLayout = [
     [-1.9, 0.1, -1.2], [-1.9, 0.1, 0.4], [0.7, 0.1, -0.4], [0.7, 0.1, 1.2],
     [-0.6, 0.1, 0], [1.8, 0.1, 0],
@@ -771,7 +777,6 @@ function createPart7Backplate(card) {
 
   addMesh(group, new RoundedBoxGeometry(9.8, 0.14, 4.4, 0.22, 5), palette.matteBlack, [0, 0, 0]);
 
-  // Backplate Graphic Plane
   const xTexture = createBackplateXTexture();
   const xMat = new THREE.MeshBasicMaterial({ map: xTexture, side: THREE.DoubleSide });
   const xPlate = new THREE.Mesh(new THREE.PlaneGeometry(9.4, 4.1), xMat);
@@ -779,7 +784,6 @@ function createPart7Backplate(card) {
   xPlate.position.set(0, -0.08, 0);
   group.add(xPlate);
 
-  // Spring-Steel GPU Retention X-Clamp
   const xClamp = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.08, 0.22), palette.steel);
   xClamp.rotation.y = 0.785;
   xClamp.position.set(-1.6, -0.09, 0);
@@ -790,7 +794,6 @@ function createPart7Backplate(card) {
   xClamp2.position.set(-1.6, -0.09, 0);
   group.add(xClamp2);
 
-  // Rear Flow-Through Honeycomb Aperture Cutout
   const cutout = new THREE.Mesh(new THREE.CylinderGeometry(1.75, 1.75, 0.22, 48), palette.graphite);
   cutout.position.set(2.45, 0, 0);
   group.add(cutout);
@@ -806,17 +809,12 @@ function createPart8RearShroud(card) {
   card.add(group);
   rememberPartTransform(group, [0, -4.0, -0.2], [14.0, 0, 0]);
 
-  // Champagne Anodized Aluminum Perimeter Shell
   addMesh(group, new RoundedBoxGeometry(10.0, 0.18, 4.5, 0.25, 6), palette.champagne, [0, 0, 0]);
-
-  // Matte Black Under-Face
   addMesh(group, new RoundedBoxGeometry(9.6, 0.08, 4.1, 0.18, 4), palette.matteBlack, [0, -0.08, 0]);
 
-  // Rear Exhaust Fan (Counter-Rotating Flow)
   const rearFan = createAxialFan(group, false);
   rearFan.position.set(2.45, -0.02, 0);
 
-  // Parallel Flow-Through Exhaust Louver Ribs
   for (let i = 0; i < 9; i += 1) {
     const x = -4.0 + i * 0.44;
     const louver = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.24, 3.8), palette.champagne);
@@ -837,17 +835,14 @@ function createIoBracket(card) {
 
   addMesh(bracket, new RoundedBoxGeometry(0.12, 2.4, 4.3, 0.05, 3), palette.steel, [0, 0, 0]);
 
-  // 3x DisplayPort 2.1 Outputs
   for (let i = 0; i < 3; i += 1) {
     const z = -1.2 + i * 0.95;
     addMesh(bracket, new THREE.BoxGeometry(0.18, 0.42, 0.62), palette.matteBlack, [-0.02, -0.35, z]);
     addMesh(bracket, new THREE.BoxGeometry(0.04, 0.18, 0.38), palette.blueGlow, [-0.1, -0.35, z]);
   }
 
-  // 1x HDMI 2.1a Port
   addMesh(bracket, new THREE.BoxGeometry(0.18, 0.36, 0.68), palette.gold, [-0.02, 0.45, -0.4]);
 
-  // Hexagonal Exhaust Ventilation Mesh
   for (let r = 0; r < 4; r += 1) {
     for (let c = 0; c < 5; c += 1) {
       const hex = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.16, 6), palette.graphite);
@@ -907,39 +902,32 @@ function createCardStudioLighting(targetGroup) {
   const lightRig = new THREE.Group();
   lightRig.name = "CardInspectionLighting";
 
-  // Key directional light for crisp specular definition
-  const keyLight = new THREE.DirectionalLight(0xffffff, 2.8);
+  const keyLight = new THREE.DirectionalLight(0xffffff, 3.2);
   keyLight.position.set(6, 14, 8);
   lightRig.add(keyLight);
 
-  // Soft front fill
-  const fillLight = new THREE.DirectionalLight(0xdce7f4, 1.8);
+  const fillLight = new THREE.DirectionalLight(0xe8f0fa, 2.2);
   fillLight.position.set(-8, 8, 8);
   lightRig.add(fillLight);
 
-  // Under fill for exploded underside
-  const underLight = new THREE.DirectionalLight(0x8ba4bf, 1.5);
+  const underLight = new THREE.DirectionalLight(0xb0c4de, 1.8);
   underLight.position.set(0, -8, 4);
   lightRig.add(underLight);
 
-  // Emerald titanium edge rim
-  const rimLight = new THREE.DirectionalLight(0x76b900, 1.1);
+  const rimLight = new THREE.DirectionalLight(0x76b900, 1.4);
   rimLight.position.set(-6, 6, -8);
   lightRig.add(rimLight);
 
-  // Overhead soft omni fill
-  const topLight = new THREE.PointLight(0xffffff, 1.8, 30, 1.5);
+  const topLight = new THREE.PointLight(0xffffff, 2.0, 30, 1.5);
   topLight.position.set(0, 10, 0);
   lightRig.add(topLight);
 
-  // Internal glowing die light
-  const internalGlow = new THREE.PointLight(0x6ee790, 2.2, 12, 2);
+  const internalGlow = new THREE.PointLight(0x6ee790, 2.6, 14, 2);
   internalGlow.position.set(0, 0, 0);
   lightRig.add(internalGlow);
 
-  // Hero Spotlight tracking focused part
-  heroSpotlight = new THREE.SpotLight(0xffffff, 0, 35, Math.PI / 4, 0.45, 1.2);
-  heroSpotlight.position.set(2, 14, 6);
+  heroSpotlight = new THREE.SpotLight(0xffffff, 0, 45, Math.PI / 4, 0.45, 1.2);
+  heroSpotlight.position.set(2, 16, 6);
   heroSpotlight.castShadow = true;
   lightRig.add(heroSpotlight);
   lightRig.add(heroSpotlight.target);
@@ -1312,12 +1300,12 @@ controls.addEventListener("start", () => {
 // Multi-Scale View Mode Controller ('facility', 'rack', 'tray', 'gpu')
 // ============================================================================
 function updateDoorBtn(isOpen) {
-  if (doorBtnText) doorBtnText.textContent = isOpen ? "Door: Close" : "Door: Open";
+  if (doorBtnText) doorBtnText.textContent = isOpen ? "Close Door" : "Open Door";
   if (btnToggleDoor) btnToggleDoor.classList.toggle("active", isOpen);
 }
 
 function updateTrayBtn(isExtended) {
-  if (trayBtnText) trayBtnText.textContent = isExtended ? "Tray: Retract" : "Tray: Extend";
+  if (trayBtnText) trayBtnText.textContent = isExtended ? "Retract Tray" : "Slide Tray";
   if (btnToggleTray) btnToggleTray.classList.toggle("active", isExtended);
 }
 
@@ -1331,7 +1319,7 @@ function switchViewMode(mode, immediate = false) {
   if (!["facility", "rack", "tray", "gpu"].includes(mode)) return;
   currentViewMode = mode;
 
-  // Toggle container classes for HUD sliding
+  // Toggle container classes for contextual HUD sliding
   sceneContainer.classList.remove("view-facility", "view-rack", "view-tray", "view-gpu");
   sceneContainer.classList.add(`view-${mode}`);
 
@@ -1708,7 +1696,6 @@ function updateCallouts() {
       }
     }
   } else {
-    // Linear Mode: Progressive horizontal alignment
     const isCardOpen = partCard && partCard.classList.contains("visible");
     activeItems.sort((a, b) => a.ax - b.ax);
 
@@ -1720,7 +1707,6 @@ function updateCallouts() {
     });
   }
 
-  // Render DOM positions and update SVG Leader Lines
   activeItems.forEach((entry) => {
     const { ax, ay, el, key, labelX, labelY } = entry;
     el.style.left = `${labelX.toFixed(1)}px`;
@@ -2042,7 +2028,13 @@ window.addEventListener("keydown", (e) => {
     return;
   }
 
-  // Component Direct Focus: Keys 5 to 8 (and Shift+1..4)
+  // Sound: S
+  if (e.key.toLowerCase() === "s") {
+    if (btnSoundToggle) btnSoundToggle.click();
+    return;
+  }
+
+  // Component Direct Focus: Keys 5 to 8
   if (e.key >= "5" && e.key <= "8") {
     const keys = ["frontShroud", "frontFan", "fanFrame", "heatsink", "pcb", "thermalPlate", "backplate", "rearShroud"];
     focusOnPart(keys[parseInt(e.key, 10) - 1]);
@@ -2067,7 +2059,7 @@ if (initialView === "exploded" || initialView === "gpu") {
 } else if (initialView === "tray" || initialView === "blade") {
   switchViewMode("tray", true);
 } else {
-  // Default: Facility Aisle perspective matching reference photo
+  // Default: Facility Aisle perspective matching photorealistic cleanroom
   switchViewMode("facility", true);
   const initPreset = datacenter.getCameraPreset("facility");
   camera.position.copy(initPreset.position);

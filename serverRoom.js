@@ -24,7 +24,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.m
 // ---------------------------------------------------------------------------
 
 /**
- * Procedural Raised Access Floor Tile Texture (600mm Datacenter Tiles)
+ * Procedural Raised Access Floor Tile Texture (600mm Datacenter Tiles - Bright Cleanroom)
  */
 function createFloorCanvasTexture(T) {
   if (typeof document === "undefined") return null;
@@ -35,24 +35,24 @@ function createFloorCanvasTexture(T) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
-  // Base dark titanium slate
-  ctx.fillStyle = "#0c1017";
+  // Base bright cleanroom white / light silver
+  ctx.fillStyle = "#f8fafc";
   ctx.fillRect(0, 0, 1024, 1024);
 
-  // Subtle fine speckle noise for anti-static matte coating
+  // Subtle cleanroom epoxy speckle
   const imgData = ctx.getImageData(0, 0, 1024, 1024);
   const data = imgData.data;
   for (let i = 0; i < data.length; i += 4) {
-    const noise = (Math.random() - 0.5) * 10;
-    data[i] = Math.max(0, Math.min(255, data[i] + noise));
-    data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise + 1));
-    data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise + 4)); // cold datacenter blue-grey
+    const noise = (Math.random() - 0.5) * 6;
+    data[i] = Math.max(235, Math.min(255, data[i] + noise));
+    data[i + 1] = Math.max(238, Math.min(255, data[i + 1] + noise));
+    data[i + 2] = Math.max(242, Math.min(255, data[i + 2] + noise + 2)); // ultra-clean cool white
   }
   ctx.putImageData(imgData, 0, 0);
 
-  // 2x2 raised floor tile grid
-  ctx.strokeStyle = "#040609";
-  ctx.lineWidth = 8;
+  // 2x2 raised floor tile grid - crisp clean seams
+  ctx.strokeStyle = "#cbd5e1";
+  ctx.lineWidth = 6;
   ctx.strokeRect(0, 0, 1024, 1024);
   ctx.beginPath();
   ctx.moveTo(512, 0);
@@ -61,13 +61,13 @@ function createFloorCanvasTexture(T) {
   ctx.lineTo(1024, 512);
   ctx.stroke();
 
-  // Subtle inner chamfer highlight
-  ctx.strokeStyle = "rgba(56, 88, 130, 0.22)";
+  // Subtle inner tile bevel highlight
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.95)";
   ctx.lineWidth = 2;
-  ctx.strokeRect(6, 6, 500, 500);
-  ctx.strokeRect(518, 6, 500, 500);
-  ctx.strokeRect(6, 518, 500, 500);
-  ctx.strokeRect(518, 518, 500, 500);
+  ctx.strokeRect(4, 4, 504, 504);
+  ctx.strokeRect(516, 4, 504, 504);
+  ctx.strokeRect(4, 516, 504, 504);
+  ctx.strokeRect(516, 516, 504, 504);
 
   // Raised tile corner screw discs / suction lifter sockets
   const corners = [
@@ -80,18 +80,18 @@ function createFloorCanvasTexture(T) {
   for (let c = 0; c < corners.length; c++) {
     const [cx, cy] = corners[c];
     ctx.beginPath();
-    ctx.arc(cx, cy, 8, 0, Math.PI * 2);
-    ctx.fillStyle = "#141a24";
+    ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+    ctx.fillStyle = "#e2e8f0";
     ctx.fill();
-    ctx.strokeStyle = "#2b3b52";
+    ctx.strokeStyle = "#94a3b8";
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
     // Screw center slot
     ctx.beginPath();
-    ctx.moveTo(cx - 3.5, cy);
-    ctx.lineTo(cx + 3.5, cy);
-    ctx.strokeStyle = "#080c14";
+    ctx.moveTo(cx - 3, cy);
+    ctx.lineTo(cx + 3, cy);
+    ctx.strokeStyle = "#64748b";
     ctx.lineWidth = 1.2;
     ctx.stroke();
   }
@@ -104,7 +104,7 @@ function createFloorCanvasTexture(T) {
 }
 
 /**
- * Procedural Floor Roughness Map (high specular sheen in center of tiles)
+ * Procedural Floor Roughness Map (mirror-gloss reflective white floor)
  */
 function createFloorRoughnessCanvasTexture(T) {
   if (typeof document === "undefined") return null;
@@ -115,13 +115,13 @@ function createFloorRoughnessCanvasTexture(T) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
-  // Tile body is glossy (darker = smoother = higher specular reflection)
-  ctx.fillStyle = "#2c2c2c"; // ~0.17 roughness
+  // Tile body is ultra-glossy (dark = low roughness = mirror specular reflection)
+  ctx.fillStyle = "#1e1e1e"; // ~0.11 roughness
   ctx.fillRect(0, 0, 512, 512);
 
-  // Tile seams have higher roughness (matte borders)
-  ctx.strokeStyle = "#999999";
-  ctx.lineWidth = 6;
+  // Tile seams have slightly higher roughness
+  ctx.strokeStyle = "#555555";
+  ctx.lineWidth = 5;
   ctx.strokeRect(0, 0, 512, 512);
   ctx.beginPath();
   ctx.moveTo(256, 0);
@@ -138,7 +138,7 @@ function createFloorRoughnessCanvasTexture(T) {
 }
 
 /**
- * Procedural Facility Wall Sign Texture
+ * Procedural Facility Wall Sign Texture (Clean Light Theme)
  */
 function createSignCanvasTexture(T, title, subtitle) {
   if (typeof document === "undefined") return null;
@@ -149,27 +149,27 @@ function createSignCanvasTexture(T, title, subtitle) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
-  // Background dark metallic plate
-  ctx.fillStyle = "#0c121d";
+  // Background clean architectural acrylic
+  ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, 1024, 256);
 
   // Border with glowing cyan accent
-  ctx.strokeStyle = "#00d2ff";
-  ctx.lineWidth = 4;
+  ctx.strokeStyle = "#0284c7";
+  ctx.lineWidth = 5;
   ctx.strokeRect(8, 8, 1008, 240);
 
   // NVIDIA Green Accent Bar on Left
   ctx.fillStyle = "#76b900";
-  ctx.fillRect(16, 16, 16, 224);
+  ctx.fillRect(16, 16, 18, 224);
 
-  // Glowing Title Text
-  ctx.fillStyle = "#ffffff";
+  // Title Text
+  ctx.fillStyle = "#0f172a";
   ctx.font = "bold 44px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
   ctx.fillText(title, 56, 92);
 
   // Subtitle / Telemetry Text
-  ctx.fillStyle = "#38bdf8";
-  ctx.font = "500 28px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  ctx.fillStyle = "#0284c7";
+  ctx.font = "600 28px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
   ctx.fillText(subtitle, 56, 150);
 
   // Status Indicator Dot & Label
@@ -178,7 +178,7 @@ function createSignCanvasTexture(T, title, subtitle) {
   ctx.arc(60, 200, 8, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.fillStyle = "#94a3b8";
+  ctx.fillStyle = "#475569";
   ctx.font = "600 20px monospace";
   ctx.fillText("FACILITY ONLINE • 512 COMPUTE BLADES ACTIVE • 100% HEALTH", 80, 206);
 
@@ -195,221 +195,222 @@ function createSharedMaterials(T) {
   const floorRoughness = createFloorRoughnessCanvasTexture(T);
 
   return {
-    // Architectural
+    // Architectural - Bright Cleanroom Surfaces
     floor: new T.MeshStandardMaterial({
-      color: 0x11161f,
+      color: 0xffffff,
       map: floorTexture || undefined,
       roughnessMap: floorRoughness || undefined,
-      roughness: 0.22,
-      metalness: 0.18,
-      envMapIntensity: 1.5
+      roughness: 0.12,
+      metalness: 0.08,
+      envMapIntensity: 2.2
     }),
 
     ceiling: new T.MeshStandardMaterial({
-      color: 0x090c12,
-      roughness: 0.75,
-      metalness: 0.3
+      color: 0xf1f5f9,
+      roughness: 0.45,
+      metalness: 0.1
     }),
 
     wall: new T.MeshStandardMaterial({
-      color: 0x10151f,
-      roughness: 0.65,
-      metalness: 0.35
+      color: 0xe2e8f0,
+      roughness: 0.5,
+      metalness: 0.2
     }),
 
     louver: new T.MeshStandardMaterial({
-      color: 0x18202e,
-      roughness: 0.5,
-      metalness: 0.65
-    }),
-
-    // Server Racks
-    rackFrame: new T.MeshStandardMaterial({
-      color: 0x12151b,
-      roughness: 0.62,
-      metalness: 0.45
-    }),
-
-    rackPanel: new T.MeshStandardMaterial({
-      color: 0x181c24,
-      roughness: 0.55,
-      metalness: 0.5
-    }),
-
-    rackRail: new T.MeshStandardMaterial({
-      color: 0x4f5b6d,
+      color: 0x94a3b8,
       roughness: 0.35,
       metalness: 0.85
     }),
 
-    glassDoor: new T.MeshPhysicalMaterial({
-      color: 0x06111f,
-      transparent: true,
-      opacity: 0.45,
-      roughness: 0.12,
-      metalness: 0.25,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.1,
-      reflectivity: 0.85
+    // Server Racks - Modern Anodized Aluminum Frames with Crystal-Clear Glass Doors
+    rackFrame: new T.MeshStandardMaterial({
+      color: 0x242a36,
+      roughness: 0.45,
+      metalness: 0.65
     }),
 
-    heroGlassDoor: new T.MeshPhysicalMaterial({
-      color: 0x081528,
-      transparent: true,
-      opacity: 0.48,
-      roughness: 0.1,
-      metalness: 0.3,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.08,
-      reflectivity: 0.95
-    }),
-
-    doorFrame: new T.MeshStandardMaterial({
-      color: 0x1e2430,
-      roughness: 0.4,
-      metalness: 0.8
-    }),
-
-    doorHandle: new T.MeshStandardMaterial({
-      color: 0x94a3b8,
-      roughness: 0.25,
-      metalness: 0.95
-    }),
-
-    // Server Chassis & Blades
-    chassisBody: new T.MeshStandardMaterial({
-      color: 0x1b2029,
-      roughness: 0.5,
-      metalness: 0.55
-    }),
-
-    chassisFace: new T.MeshStandardMaterial({
-      color: 0x151a22,
-      roughness: 0.42,
-      metalness: 0.6
-    }),
-
-    ventMesh: new T.MeshStandardMaterial({
-      color: 0x090c12,
-      roughness: 0.85,
-      metalness: 0.2
-    }),
-
-    pcb: new T.MeshStandardMaterial({
-      color: 0x0b2416, // dark enterprise server green PCB
-      roughness: 0.42,
-      metalness: 0.28
-    }),
-
-    heatsinkFin: new T.MeshStandardMaterial({
-      color: 0x78716c,
-      roughness: 0.28,
-      metalness: 0.9
-    }),
-
-    copperPipe: new T.MeshStandardMaterial({
-      color: 0xb45309,
-      roughness: 0.25,
-      metalness: 0.88
-    }),
-
-    goldContact: new T.MeshStandardMaterial({
-      color: 0xf59e0b,
-      roughness: 0.22,
-      metalness: 0.98
-    }),
-
-    steelRail: new T.MeshStandardMaterial({
-      color: 0x94a3b8,
-      roughness: 0.25,
-      metalness: 0.92
-    }),
-
-    fanHub: new T.MeshStandardMaterial({
-      color: 0x0f172a,
+    rackPanel: new T.MeshStandardMaterial({
+      color: 0x334155,
       roughness: 0.4,
       metalness: 0.7
     }),
 
-    fanBlade: new T.MeshStandardMaterial({
-      color: 0x1e293b,
-      roughness: 0.3,
-      metalness: 0.4
+    rackRail: new T.MeshStandardMaterial({
+      color: 0xd1d5db,
+      roughness: 0.25,
+      metalness: 0.95
     }),
 
-    // Emissive Lighting & Indicators
+    // High Transparency Glass Doors so servers and glowing LEDs are clearly visible from outside
+    glassDoor: new T.MeshPhysicalMaterial({
+      color: 0xa5f3fc,
+      transparent: true,
+      opacity: 0.24,
+      roughness: 0.04,
+      metalness: 0.85,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.04,
+      reflectivity: 0.98
+    }),
+
+    heroGlassDoor: new T.MeshPhysicalMaterial({
+      color: 0x67e8f9,
+      transparent: true,
+      opacity: 0.22,
+      roughness: 0.03,
+      metalness: 0.85,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.04,
+      reflectivity: 0.98
+    }),
+
+    doorFrame: new T.MeshStandardMaterial({
+      color: 0x475569,
+      roughness: 0.35,
+      metalness: 0.85
+    }),
+
+    doorHandle: new T.MeshStandardMaterial({
+      color: 0xf1f5f9,
+      roughness: 0.15,
+      metalness: 0.98
+    }),
+
+    // Server Chassis & Blades - Bright Brushed Aluminum Faceplates & Metallic Rails
+    chassisBody: new T.MeshStandardMaterial({
+      color: 0x94a3b8,
+      roughness: 0.4,
+      metalness: 0.7
+    }),
+
+    chassisFace: new T.MeshStandardMaterial({
+      color: 0xd8e0ec,
+      roughness: 0.28,
+      metalness: 0.75
+    }),
+
+    ventMesh: new T.MeshStandardMaterial({
+      color: 0x1e293b,
+      roughness: 0.8,
+      metalness: 0.3
+    }),
+
+    pcb: new T.MeshStandardMaterial({
+      color: 0x0f4024, // vibrant enterprise server green PCB
+      roughness: 0.35,
+      metalness: 0.3
+    }),
+
+    heatsinkFin: new T.MeshStandardMaterial({
+      color: 0xd4d4d8,
+      roughness: 0.22,
+      metalness: 0.92
+    }),
+
+    copperPipe: new T.MeshStandardMaterial({
+      color: 0xf59e0b,
+      roughness: 0.2,
+      metalness: 0.9
+    }),
+
+    goldContact: new T.MeshStandardMaterial({
+      color: 0xfbbf24,
+      roughness: 0.2,
+      metalness: 0.98
+    }),
+
+    steelRail: new T.MeshStandardMaterial({
+      color: 0xf8fafc,
+      roughness: 0.12,
+      metalness: 0.98
+    }),
+
+    fanHub: new T.MeshStandardMaterial({
+      color: 0x1e293b,
+      roughness: 0.4,
+      metalness: 0.6
+    }),
+
+    fanBlade: new T.MeshStandardMaterial({
+      color: 0x334155,
+      roughness: 0.3,
+      metalness: 0.5
+    }),
+
+    // Emissive Lighting & Indicators - High-Vibrancy Status LEDs
     ledBlue: new T.MeshStandardMaterial({
-      color: 0x0090ff,
-      emissive: 0x0080ff,
-      emissiveIntensity: 2.8,
+      color: 0x0088ff,
+      emissive: 0x0088ff,
+      emissiveIntensity: 3.2,
       toneMapped: false
     }),
 
     ledCyan: new T.MeshStandardMaterial({
-      color: 0x00f0ff,
-      emissive: 0x00d4ff,
-      emissiveIntensity: 2.6,
+      color: 0x00e5ff,
+      emissive: 0x00e5ff,
+      emissiveIntensity: 3.4,
       toneMapped: false
     }),
 
     ledGreen: new T.MeshStandardMaterial({
       color: 0x10b981,
       emissive: 0x10b981,
-      emissiveIntensity: 2.4,
+      emissiveIntensity: 3.0,
       toneMapped: false
     }),
 
     ledAmber: new T.MeshStandardMaterial({
       color: 0xf59e0b,
       emissive: 0xf59e0b,
-      emissiveIntensity: 2.2,
-      toneMapped: false
-    }),
-
-    coveBlue: new T.MeshStandardMaterial({
-      color: 0x00d2ff,
-      emissive: 0x00c3ff,
-      emissiveIntensity: 3.4,
-      toneMapped: false
-    }),
-
-    coveCeiling: new T.MeshStandardMaterial({
-      color: 0x0284c7,
-      emissive: 0x0369a1,
       emissiveIntensity: 2.8,
       toneMapped: false
     }),
 
+    coveBlue: new T.MeshStandardMaterial({
+      color: 0x00b4d8,
+      emissive: 0x00b4d8,
+      emissiveIntensity: 3.2,
+      toneMapped: false
+    }),
+
+    coveCeiling: new T.MeshStandardMaterial({
+      color: 0x38bdf8,
+      emissive: 0x38bdf8,
+      emissiveIntensity: 2.6,
+      toneMapped: false
+    }),
+
     overheadLinearLight: new T.MeshStandardMaterial({
-      color: 0xf0f9ff,
-      emissive: 0xdbeafe,
+      color: 0xffffff,
+      emissive: 0xffffff,
       emissiveIntensity: 3.5,
       toneMapped: false
     }),
 
-    // Cable Management
+    // Cable Management - Bright Galvanized Trays & Vivid Bundles
     cableTray: new T.MeshStandardMaterial({
-      color: 0x272e3b,
-      roughness: 0.5,
-      metalness: 0.75
+      color: 0x94a3b8,
+      roughness: 0.35,
+      metalness: 0.85
     }),
 
     cableYellow: new T.MeshStandardMaterial({
       color: 0xeab308,
-      roughness: 0.42,
-      metalness: 0.15
+      roughness: 0.35,
+      metalness: 0.2
     }),
 
     cableBlue: new T.MeshStandardMaterial({
       color: 0x0284c7,
-      roughness: 0.4,
-      metalness: 0.18
+      roughness: 0.35,
+      metalness: 0.2
     }),
 
     cableCyan: new T.MeshStandardMaterial({
       color: 0x06b6d4,
-      roughness: 0.4,
-      metalness: 0.18
+      roughness: 0.35,
+      metalness: 0.2
     })
   };
 }
@@ -1245,49 +1246,66 @@ export function createServerRoom(scene, options = {}) {
   roomGroup.add(rightRackRowGroup);
 
   // -------------------------------------------------------------------------
-  // 6. Datacenter Lighting Rig
+  // 6. Datacenter Lighting Rig (Bright Cleanroom Light Theme)
   // -------------------------------------------------------------------------
 
   const datacenterLights = [];
 
   if (options.addLights !== false) {
-    // Ambient Deep Datacenter Blue
-    const ambientLight = new T.AmbientLight(0x0a1628, 0.9);
+    // Ambient Daylight / Cleanroom White - eliminates pitch-black shadows
+    const ambientLight = new T.AmbientLight(0xffffff, 1.8);
     roomGroup.add(ambientLight);
     datacenterLights.push(ambientLight);
 
-    // Hemisphere: Cool Cyan Sky bounce, Deep Charcoal Floor bounce
-    const hemiLight = new T.HemisphereLight(0x38bdf8, 0x050d18, 0.85);
+    // Hemisphere: Crisp White Sky bounce, Light Silver Floor bounce
+    const hemiLight = new T.HemisphereLight(0xffffff, 0xe2e8f0, 1.4);
     hemiLight.position.set(0, roomHeight, 0);
     roomGroup.add(hemiLight);
     datacenterLights.push(hemiLight);
 
-    // Aisle Downward Overhead Point Lights (Cool White / Soft Cyan)
-    const aisleZPoints = [-84, -28, 28, 84];
+    // Primary Directional Aisle Fill Lights for crisp metallic highlights
+    const dirLight1 = new T.DirectionalLight(0xffffff, 1.5);
+    dirLight1.position.set(18.0, 75.0, 30.0);
+    roomGroup.add(dirLight1);
+    datacenterLights.push(dirLight1);
+
+    const dirLight2 = new T.DirectionalLight(0xffffff, 1.2);
+    dirLight2.position.set(-18.0, 75.0, -30.0);
+    roomGroup.add(dirLight2);
+    datacenterLights.push(dirLight2);
+
+    // Downward Overhead Fluorescent / LED Troffers (7 fixtures along aisle corridor)
+    const aisleZPoints = [-105, -70, -35, 0, 35, 70, 105];
     for (let lz = 0; lz < aisleZPoints.length; lz++) {
-      const light = new T.PointLight(0xdbeafe, 1.4, 85, 1.6);
-      light.position.set(0, roomHeight - 6.0, aisleZPoints[lz]);
+      const light = new T.PointLight(0xffffff, 2.2, 120, 1.2);
+      light.position.set(0, roomHeight - 5.0, aisleZPoints[lz]);
       roomGroup.add(light);
       datacenterLights.push(light);
     }
 
-    // Floor Level Cyan Wash Lights (giving glossy floor reflections)
+    // Floor Level High-Tech Cyan Accent Wash Lights
     const floorZPoints = [-70, 0, 70];
     for (let fz = 0; fz < floorZPoints.length; fz++) {
-      const washLightL = new T.PointLight(0x00d2ff, 1.2, 42, 2.0);
+      const washLightL = new T.PointLight(0x00b4d8, 1.4, 45, 1.8);
       washLightL.position.set(-17.0, 1.2, floorZPoints[fz]);
       roomGroup.add(washLightL);
       datacenterLights.push(washLightL);
 
-      const washLightR = new T.PointLight(0x00d2ff, 1.2, 42, 2.0);
+      const washLightR = new T.PointLight(0x00b4d8, 1.4, 45, 1.8);
       washLightR.position.set(17.0, 1.2, floorZPoints[fz]);
       roomGroup.add(washLightR);
       datacenterLights.push(washLightR);
     }
 
-    // Hero Rack Dedicated Key Spotlight
-    const heroSpot = new T.SpotLight(0xffffff, 2.4, 90, Math.PI / 4, 0.55, 1.4);
-    heroSpot.position.set(-6.0, 52.0, (heroRackIndex - halfRows) * rackSpacingZ + 18.0);
+    // Dedicated Hero Rack Internal Illumination (makes internal GPUs shine)
+    const heroInternalLight = new T.PointLight(0xffffff, 2.8, 38, 1.2);
+    heroInternalLight.position.set(leftTrayX + 6.0, 40.0, (heroRackIndex - halfRows) * rackSpacingZ);
+    roomGroup.add(heroInternalLight);
+    datacenterLights.push(heroInternalLight);
+
+    // Hero Rack Key Studio Spotlight (illuminates Rack 04 and extended 4U tray)
+    const heroSpot = new T.SpotLight(0xffffff, 3.2, 110, Math.PI / 3.2, 0.45, 1.1);
+    heroSpot.position.set(-6.0, 56.0, (heroRackIndex - halfRows) * rackSpacingZ + 20.0);
     heroSpot.target.position.set(leftTrayX + 12.0, 36.6, (heroRackIndex - halfRows) * rackSpacingZ);
     roomGroup.add(heroSpot);
     roomGroup.add(heroSpot.target);
