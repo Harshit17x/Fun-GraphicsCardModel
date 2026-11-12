@@ -3,33 +3,90 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#121316" />
-    <title>NVIDIA GeForce RTX 4090 Founders Edition — 3D Exploded View</title>
+    <meta name="theme-color" content="#080e1c" />
+    <title>NVIDIA DGX SuperPOD™ Facility • AI Supercomputing Cluster &amp; RTX 4090 3D View</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=13" />
+    <link rel="stylesheet" href="./styles.css?v=14" />
   </head>
   <body>
-    <main id="scene-container" aria-label="Interactive NVIDIA GeForce RTX 4090 Founders Edition 3D visualization">
+    <main id="scene-container" class="view-facility" aria-label="NVIDIA DGX SuperPOD Datacenter and RTX 4090 3D Interactive Visualization">
       <!-- Loading Overlay -->
       <div class="scene-loader" id="sceneLoader">
-        <div class="spinner"></div>
-        <span>Loading RTX 4090 3D Model...</span>
+        <div class="loader-visual">
+          <div class="spinner"></div>
+          <div class="loader-logo-core">DGX</div>
+        </div>
+        <div class="loader-text-group">
+          <span class="loader-title">NVIDIA DGX SuperPOD™ Facility</span>
+          <span class="loader-sub">Initializing AI Supercomputing Cluster &amp; RTX 4090 Compute Blade...</span>
+        </div>
       </div>
 
-      <!-- Top Information Bar -->
+      <!-- Top Information Bar: Datacenter Branding & Telemetry HUD -->
       <header class="top-bar">
         <div class="brand-badge">
           <div class="brand-logo-dot"></div>
           <div class="brand-meta">
-            <span class="brand-title">NVIDIA GeForce RTX 4090</span>
-            <span class="brand-subtitle">Founders Edition • 24 GB GDDR6X • Ada Lovelace AD102</span>
+            <span class="brand-title">NVIDIA DGX SuperPOD™ Facility</span>
+            <span class="brand-subtitle">AI Supercomputing Cluster • 512-Node Scalable Fabric</span>
+          </div>
+          <div class="status-indicator-pill">
+            <span class="status-pulse"></span>
+            <span class="status-label">ONLINE • OPTIMAL</span>
           </div>
         </div>
 
+        <!-- Telemetry Strip HUD -->
+        <div class="telemetry-strip" id="datacenterTelemetry" aria-label="Datacenter Telemetry Metrics">
+          <div class="telemetry-card">
+            <span class="telemetry-label">Active Compute</span>
+            <div class="telemetry-primary">
+              <span class="telemetry-icon">⚡</span>
+              <span class="telemetry-value">512 Active GPUs</span>
+            </div>
+            <span class="telemetry-detail">4090 / H100 Hybrid</span>
+          </div>
+
+          <div class="telemetry-divider" aria-hidden="true"></div>
+
+          <div class="telemetry-card">
+            <span class="telemetry-label">AI Throughput</span>
+            <div class="telemetry-primary">
+              <span class="telemetry-icon">🧠</span>
+              <span class="telemetry-value">1.64 ExaFLOPS</span>
+            </div>
+            <span class="telemetry-detail">FP8 Tensor Core AI</span>
+          </div>
+
+          <div class="telemetry-divider" aria-hidden="true"></div>
+
+          <div class="telemetry-card">
+            <span class="telemetry-label">Power &amp; Efficiency</span>
+            <div class="telemetry-primary">
+              <span class="telemetry-icon">🔋</span>
+              <span class="telemetry-value">428 kW</span>
+            </div>
+            <span class="telemetry-detail">1.12 PUE Eco</span>
+          </div>
+
+          <div class="telemetry-divider" aria-hidden="true"></div>
+
+          <div class="telemetry-card">
+            <span class="telemetry-label">Thermal Delta</span>
+            <div class="telemetry-primary">
+              <span class="telemetry-icon">❄️</span>
+              <span class="telemetry-value">18.5°C / 31.2°C</span>
+            </div>
+            <span class="telemetry-detail">Inflow / Outflow</span>
+          </div>
+        </div>
+
+        <!-- Top Right Actions -->
         <div class="top-actions">
-          <div class="mode-switch-group">
+          <!-- 3D vs Linear Explode Mode Group -->
+          <div class="mode-switch-group" id="gpuExplodeModes">
             <button id="btnMode3D" class="chip-btn active" title="3D Layered Depth Explode">
               <span class="chip-icon">⇪</span>
               <span class="chip-text">3D Stack</span>
@@ -40,12 +97,60 @@
             </button>
           </div>
 
-          <button id="btnAutoRotate" class="chip-btn" aria-label="Toggle Auto Rotation">
+          <!-- Sound Hum Audio Toggle -->
+          <button id="btnSoundToggle" class="chip-btn sound-toggle" aria-label="Toggle Datacenter Hum Audio" title="Toggle Procedural Datacenter Audio Hum">
+            <span class="chip-icon sound-icon" id="soundIcon">🔇</span>
+            <span class="chip-text" id="soundText">Audio: Hum Muted</span>
+          </button>
+
+          <!-- Auto Orbit Camera Toggle -->
+          <button id="btnAutoRotate" class="chip-btn" aria-label="Toggle Auto Rotation" title="Toggle Auto Orbit (Key O)">
             <span class="chip-icon">⟳</span>
             <span class="chip-text">Auto Orbit</span>
           </button>
         </div>
       </header>
+
+      <!-- Multi-Scale View Mode Switcher -->
+      <nav class="view-mode-bar" id="viewModeBar" aria-label="Multi-Scale Facility Navigation">
+        <div class="view-mode-group">
+          <button id="btnViewFacility" class="view-nav-btn active" data-view="facility" title="Facility Wide Aisle (Key 1)">
+            <span class="view-icon">🏢</span>
+            <div class="view-text-block">
+              <span class="view-title">Facility Aisle</span>
+              <span class="view-sub">Corridor View</span>
+            </div>
+            <kbd>1</kbd>
+          </button>
+
+          <button id="btnViewRack" class="view-nav-btn" data-view="rack" title="Server Rack 04 (Key 2)">
+            <span class="view-icon">🖥️</span>
+            <div class="view-text-block">
+              <span class="view-title">Server Rack 04</span>
+              <span class="view-sub">Hero 42U Enclosure</span>
+            </div>
+            <kbd>2</kbd>
+          </button>
+
+          <button id="btnViewTray" class="view-nav-btn" data-view="tray" title="GPU Blade Sled (Key 3)">
+            <span class="view-icon">🗄️</span>
+            <div class="view-text-block">
+              <span class="view-title">GPU Blade Sled</span>
+              <span class="view-sub">4U 8x GPU Compute</span>
+            </div>
+            <kbd>3</kbd>
+          </button>
+
+          <button id="btnViewGpu" class="view-nav-btn" data-view="gpu" title="GPU Deep Dive & Explode (Key 4)">
+            <span class="view-icon">🔬</span>
+            <div class="view-text-block">
+              <span class="view-title">GPU Deep Dive &amp; Explode</span>
+              <span class="view-sub">RTX 4090 8-Part Stack</span>
+            </div>
+            <kbd>4</kbd>
+          </button>
+        </div>
+      </nav>
 
       <!-- 3D Component Inspection Mode Floating Banner -->
       <div class="focus-mode-banner" id="focusModeBanner" aria-live="polite">
@@ -75,7 +180,7 @@
           <span class="callout-num">1</span>
           <div class="callout-content">
             <div class="callout-text">Front Shroud</div>
-            <div class="callout-sub">Hourglass X-Frame & RTX 4090</div>
+            <div class="callout-sub">Hourglass X-Frame &amp; RTX 4090</div>
           </div>
         </div>
 
@@ -98,16 +203,16 @@
         <div class="callout-tag" id="tagHeatsink" data-part="heatsink">
           <span class="callout-num">4</span>
           <div class="callout-content">
-            <div class="callout-text">Heatsink & Heat Pipes</div>
-            <div class="callout-sub">Vapor Chamber & 64 Fins</div>
+            <div class="callout-text">Heatsink &amp; Heat Pipes</div>
+            <div class="callout-sub">Vapor Chamber &amp; 64 Fins</div>
           </div>
         </div>
 
         <div class="callout-tag" id="tagPcb" data-part="pcb">
           <span class="callout-num">5</span>
           <div class="callout-content">
-            <div class="callout-text">PCB & GPU Core</div>
-            <div class="callout-sub">AD102 Die & 24GB GDDR6X</div>
+            <div class="callout-text">PCB &amp; GPU Core</div>
+            <div class="callout-sub">AD102 Die &amp; 24GB GDDR6X</div>
           </div>
         </div>
 
@@ -123,14 +228,14 @@
           <span class="callout-num">7</span>
           <div class="callout-content">
             <div class="callout-text">Backplate</div>
-            <div class="callout-sub">Anodized Alloy & X-Bracket</div>
+            <div class="callout-sub">Anodized Alloy &amp; X-Bracket</div>
           </div>
         </div>
 
         <div class="callout-tag" id="tagRearShroud" data-part="rearShroud">
           <span class="callout-num">8</span>
           <div class="callout-content">
-            <div class="callout-text">Rear Shroud & Fan</div>
+            <div class="callout-text">Rear Shroud &amp; Fan</div>
             <div class="callout-sub">Flow-Through Exhaust System</div>
           </div>
         </div>
@@ -159,7 +264,7 @@
             <span class="stat-value" id="statDimensions">-</span>
           </div>
           <div class="stat-item">
-            <span class="stat-label">Cooling & Power</span>
+            <span class="stat-label">Cooling &amp; Power</span>
             <span class="stat-value" id="statCooling">-</span>
           </div>
         </div>
@@ -171,7 +276,8 @@
       </aside>
 
       <!-- Dimension Overlay Box (Toggleable Reference overlay) -->
-      <div class="spec-banner">
+      <div class="spec-banner" id="specBanner">
+        <span class="spec-tag-accent">RTX 4090 SPEC</span>
         <span>304 mm (Length)</span>
         <span>•</span>
         <span>137 mm (Height)</span>
@@ -185,11 +291,47 @@
       <canvas id="scene-canvas"></canvas>
 
       <!-- Bottom Interactive Control Center (HUD) -->
-      <div class="bottom-dock">
-        <div class="hud-panel">
+      <div class="bottom-dock" id="bottomDock">
+        <!-- Datacenter Facility & Rack Controls Bar -->
+        <div class="facility-control-bar" id="facilityControlBar">
+          <!-- Interactive Rack & Blade Action Buttons -->
+          <div class="facility-action-group">
+            <button id="btnToggleDoor" class="action-btn" title="Toggle Hero Rack 04 Glass Door (Key D)">
+              <span class="action-btn-icon">🚪</span>
+              <span class="action-btn-text" id="doorBtnText">Door: Open</span>
+              <kbd>D</kbd>
+            </button>
+
+            <button id="btnToggleTray" class="action-btn" title="Toggle 4U Blade Sled Extension (Key T)">
+              <span class="action-btn-icon">⇲</span>
+              <span class="action-btn-text" id="trayBtnText">Tray: Extend</span>
+              <kbd>T</kbd>
+            </button>
+          </div>
+
+          <!-- Camera Presets Strip -->
+          <div class="camera-presets-group" id="camPresetsGroup">
+            <span class="presets-label">Camera:</span>
+            <button id="btnCamAisle" class="cam-preset-btn active" data-cam="aisle" title="Facility Aisle Central Perspective">
+              Aisle Perspective
+            </button>
+            <button id="btnCamFlythrough" class="cam-preset-btn" data-cam="flythrough" title="Dynamic Aisle Flythrough View">
+              Flythrough
+            </button>
+            <button id="btnCamRack" class="cam-preset-btn" data-cam="rack" title="Rack 04 Front Framing">
+              Rack Front
+            </button>
+            <button id="btnCamBlade" class="cam-preset-btn" data-cam="blade" title="Compute Blade Sled Top-Down View">
+              Blade Top-Down
+            </button>
+          </div>
+        </div>
+
+        <!-- GPU Explode View Panel (Active during GPU mode, smoothly slides/toggles) -->
+        <div class="hud-panel" id="gpuExplodePanel">
           <div class="hud-main-row">
             <!-- Primary Explode Button -->
-            <button id="btnExplode" class="btn-explode-toggle" aria-pressed="false">
+            <button id="btnExplode" class="btn-explode-toggle" aria-pressed="false" title="Toggle GPU 3D Explosion (Spacebar)">
               <span class="icon-explode">💥</span>
               <span id="btnExplodeText">Explode View</span>
             </button>
@@ -211,7 +353,7 @@
             </div>
           </div>
 
-          <!-- Secondary Row: Presets & Utilities -->
+          <!-- Secondary Row: Presets & Numbered Part Selectors -->
           <div class="hud-secondary-row">
             <div class="preset-group">
               <button class="preset-btn active" data-preset="0">Assembled</button>
@@ -220,7 +362,7 @@
             </div>
 
             <!-- Numbered Part Quick-Selector Strip (1 to 8) -->
-            <div class="parts-quick-strip">
+            <div class="parts-quick-strip" title="Directly inspect card components 1 to 8">
               <button class="part-pill" data-part="frontShroud" title="1. Front Shroud">1</button>
               <button class="part-pill" data-part="frontFan" title="2. Axial Fan">2</button>
               <button class="part-pill" data-part="fanFrame" title="3. Fan Frame">3</button>
@@ -232,7 +374,7 @@
             </div>
 
             <div class="util-group">
-              <button id="btnResetView" class="util-btn" title="Reset Camera and View">
+              <button id="btnResetView" class="util-btn" title="Reset Camera and View (Key R)">
                 <span>↺</span> Reset View
               </button>
             </div>
@@ -241,6 +383,12 @@
 
         <!-- Keyboard hotkey shortcuts -->
         <div class="hotkey-hints">
+          <span><kbd>1</kbd>–<kbd>4</kbd> Views</span>
+          <span>&bull;</span>
+          <span><kbd>D</kbd> Door</span>
+          <span>&bull;</span>
+          <span><kbd>T</kbd> Tray</span>
+          <span>&bull;</span>
           <span><kbd>Space</kbd> Explode</span>
           <span>&bull;</span>
           <span><kbd>Click</kbd> / <kbd>1</kbd>–<kbd>8</kbd> Focus Part</span>
@@ -261,6 +409,6 @@
         }
       }
     </script>
-    <script type="module" src="./main.js?v=13"></script>
+    <script type="module" src="./main.js?v=14"></script>
   </body>
 </html>

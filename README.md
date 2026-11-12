@@ -1,27 +1,56 @@
-# Fun-GraphicsCardModel
+# NVIDIA AI Supercomputer Datacenter & RTX 4090 3D Visualization
 
 [![Three.js](https://img.shields.io/badge/Three.js-r165-black?style=for-the-badge&logo=three.dot_js)](https://threejs.org/)
 [![WebGL](https://img.shields.io/badge/WebGL-2.0-990000?style=for-the-badge&logo=webgl)](https://www.khronos.org/webgl/)
 [![JavaScript](https://img.shields.io/badge/ES6+-Vanilla%20JS-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-An interactive, high-fidelity 3D graphics card concept visualization built from scratch with **Three.js** and **WebGL**. 
+An interactive, high-fidelity **AI Supercomputer Datacenter Facility** and **NVIDIA GeForce RTX 4090 Founders Edition 3D concept visualization** built with **Three.js** and **WebGL**.
 
-Modeled procedurally after flagship triple-fan graphics cards (codenamed **"BLACKOUT / 24 GB"**), this project features physically-based materials (PBR), studio lighting, spinning fans with dynamic RGB glow, smooth orbit controls, and an interactive **Exploded Engineering View** that deconstructs every layer of the GPU in real-time.
+Explore an entire enterprise server room populated with rows of 42U high-density GPU server racks glowing with deep blue LED ambiance, reflective floor tiles, overhead cable ladders, and dynamic telemetry. Inspect individual racks, slide out 4U GPU compute sleds, and zoom seamlessly into an individual RTX 4090 to deconstruct its engineering layers in real-time.
 
 ---
 
 ## 🌟 Highlights & Features
 
-- **🎮 360° Interactive Orbit Controls**: Inspect the card from any angle with smooth damping/inertia, pan restrictions, and zoom clamping.
-- **💥 Real-Time Exploded View**: Click the **"Explode View"** button, scrub the **Deconstruct Slider (0%–100%)**, or press `E`/`Space` to separate the card into distinct engineering layers using smooth vector lerp animations.
-- **🏷️ Dynamic 3D Callout Badges**: Interactive screen-projected tags float directly over parts when exploded, pointing to the Shroud, Heatsink, PCB, Backplate, Bracket, and PCIe Interface.
-- **📋 Component Specification Inspector**: Click any callout tag or 3D mesh to open an interactive drawer displaying materials, dimensions, and engineering functions.
-- **🌀 Triple 92mm Axial Fan Array**: Three independently spinning cooling fans (11 curved blades each with alternating graphite textures) and pulsing RGB LED halo rings.
-- **⚡ Procedural Hardware Architecture**: Complete GPU anatomy modeled down to the GPU die, VRAM chips, copper traces, capacitors, heatsink fins, heat pipes, and gold PCIe contacts.
-- **💡 Photorealistic Studio Lighting**: Multi-point lighting setup featuring directional key lighting, subtle rim illumination, ambient hemisphere lighting, and localized red/blue accent glows with soft PCF shadow maps.
-- **🔄 Auto Orbit Mode**: One-click automatic continuous rotation for showcase and presentation views.
-- **🚀 Zero Build Setup**: Pure ES modules served directly from CDN via modern browser Import Maps. No npm install, Webpack, or Vite required!
+### 🏢 AI Datacenter Supercomputer Facility (Modeled after reference architecture)
+- **Massive Dual-Aisle Server Corridor**: Dual opposing rows of 42U server racks with tinted glass doors and dynamic telemetry activity LEDs (blue, cyan, green, amber).
+- **Photorealistic Datacenter Environment**: High-gloss reflective raised tile floor (60×60 cm grid), suspended yellow/blue fiber optic cable ladders, overhead linear LED luminaires, and atmospheric blue volumetric fog.
+- **Interactive Hero Rack (Rack 04)**: Smoothly pivot the glass door open (0°–95°) to reveal internal compute blades.
+- **Telescoping 4U GPU Compute Sled**: Slide out the 8× GPU server tray forward into the aisle on 3-stage steel slide rails.
+- **Web Audio Datacenter Ambient Hum**: Procedural Web Audio API synthesizer generating dual 60Hz/120.6Hz transformer drone + filtered pink noise airflow with mute/unmute control.
+
+### 🔬 Multi-Scale Interactive View Modes
+- **🏢 Facility Aisle View**: Wide corridor perspective matching datacenter reference photography.
+- **🖥️ Server Rack View**: Beauty angle focusing on Rack 04 (Compute Pod Alpha).
+- **🗄️ GPU Blade Sled View**: Top-quarter inspection of the slide-out 8× GPU compute tray.
+- **🔬 Single GPU Exploded View**: Smoothly zeroes in on the hero RTX 4090 Founders Edition card.
+
+### 💥 RTX 4090 Exploded Engineering View
+- **Real-Time Exploded Deconstruction**: Scrub the **Deconstruct Slider (0%–100%)** or toggle 3D Stack / Linear views to separate the card into 8 distinct engineering assemblies.
+- **Dynamic 3D Screen-Projected Callout Badges**: Interactive badges and SVG leader lines pointing to the Front Shroud, Axial Fan, Fan Frame, Heatsink, PCB, Thermal Midplate, Backplate, and Rear Shroud.
+- **Technical Specification Inspector**: Click any callout tag or 3D mesh to view detailed engineering materials, dimensions, and cooling parameters.
+- **Counter-Rotating Dual Axial Fans**: Front intake and rear exhaust fans spinning in counter-rotation with dynamic blur.
+
+---
+
+## 🕹️ Controls & Navigation
+
+| Action | Shortcut / UI Control |
+| :--- | :--- |
+| **Facility Aisle View** | Press <kbd>1</kbd> or click `Facility Aisle` |
+| **Server Rack View** | Press <kbd>2</kbd> or click `Server Rack` |
+| **GPU Blade Sled View** | Press <kbd>3</kbd> or click `GPU Blade` |
+| **Single GPU Exploded View** | Press <kbd>4</kbd> or click `GPU Deep Dive` |
+| **Toggle Rack Door** | Press <kbd>D</kbd> or click `Open/Close Door` |
+| **Slide Compute Tray** | Press <kbd>T</kbd> or click `Extend/Retract Tray` |
+| **Toggle Datacenter Sound** | Press <kbd>S</kbd> or click `Audio Hum` |
+| **Toggle Exploded View** | Press <kbd>Space</kbd> / <kbd>E</kbd> or click `Explode View` |
+| **Switch Explode Mode (3D / Linear)** | Press <kbd>M</kbd> or click `3D Stack` / `Linear View` |
+| **Component Quick-Focus** | Press <kbd>5</kbd>–<kbd>8</kbd> or click Part Pills 1–8 |
+| **Exit Component Focus** | Press <kbd>Esc</kbd> |
+| **Toggle Auto Orbit** | Press <kbd>O</kbd> or click `Auto Orbit` |
+| **Reset Camera View** | Press <kbd>R</kbd> or click `Reset View` |
 
 ---
 
