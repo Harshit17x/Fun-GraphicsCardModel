@@ -4,176 +4,158 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f1f5f9" />
-    <title>NVIDIA DGX SuperPOD™ Datacenter &amp; RTX 4090 Interactive 3D</title>
+    <title>NVIDIA DGX SuperPOD™ &amp; RTX 4090 3D</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=15" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css?v=17" />
   </head>
   <body>
-    <main id="scene-container" class="view-facility" aria-label="NVIDIA DGX SuperPOD Datacenter and RTX 4090 3D Interactive Visualization">
-      <!-- Light Theme Loading Overlay -->
+    <main
+      id="scene-container"
+      class="view-facility"
+      aria-label="NVIDIA DGX SuperPOD Datacenter and RTX 4090 3D Interactive Visualization"
+    >
+      <!-- Minimal Studio Loader -->
       <div class="scene-loader" id="sceneLoader">
-        <div class="loader-visual">
-          <div class="spinner"></div>
-          <div class="loader-logo-core">DGX</div>
-        </div>
-        <div class="loader-text-group">
-          <span class="loader-title">NVIDIA SuperPOD™ Facility</span>
-          <span class="loader-sub">Loading Photorealistic Datacenter &amp; RTX 4090...</span>
-        </div>
+        <div class="loader-spinner"></div>
+        <span class="loader-label">Loading 3D Scene…</span>
       </div>
 
-      <!-- Minimal, Modern Light Frosted Glass Header -->
+      <!-- Clean Minimalist Top Bar -->
       <header class="top-bar">
-        <!-- Brand identity (Left) -->
+        <!-- Quiet Brand Wordmark (Left) -->
         <div class="brand-badge">
-          <div class="brand-logo-dot"></div>
-          <div class="brand-meta">
-            <span class="brand-title">NVIDIA RTX 4090</span>
-            <span class="brand-subtitle">AI SuperPOD Datacenter</span>
-          </div>
-          <div class="status-indicator-pill">
-            <span class="status-pulse"></span>
-            <span class="status-label">ONLINE</span>
-          </div>
+          <span class="brand-dot" aria-hidden="true"></span>
+          <span class="brand-title">RTX 4090</span>
+          <span class="brand-sep" aria-hidden="true">/</span>
+          <span class="brand-subtitle">DGX SuperPOD</span>
         </div>
 
-        <!-- Single Clean Segmented View Switcher Pill (Center) -->
-        <nav class="view-segmented-pill" id="viewModeBar" aria-label="Datacenter View Modes">
-          <button id="btnViewFacility" class="seg-btn active" data-view="facility" title="Facility Aisle (Key 1)">
-            <span class="seg-icon">🏢</span>
-            <span class="seg-text">Aisle</span>
-            <kbd>1</kbd>
+        <!-- Clean Floating View Switcher (Center) -->
+        <nav class="view-segmented-pill" id="viewModeBar" aria-label="View Modes">
+          <button id="btnViewFacility" class="seg-btn active" data-view="facility" title="Facility Aisle (1)">
+            Aisle
           </button>
-          <button id="btnViewRack" class="seg-btn" data-view="rack" title="Server Rack 04 (Key 2)">
-            <span class="seg-icon">🖥️</span>
-            <span class="seg-text">Rack 04</span>
-            <kbd>2</kbd>
+          <button id="btnViewRack" class="seg-btn" data-view="rack" title="Server Rack 04 (2)">
+            Rack 04
           </button>
-          <button id="btnViewTray" class="seg-btn" data-view="tray" title="GPU Blade Sled (Key 3)">
-            <span class="seg-icon">🗄️</span>
-            <span class="seg-text">GPU Blade</span>
-            <kbd>3</kbd>
+          <button id="btnViewTray" class="seg-btn" data-view="tray" title="GPU Blade Sled (3)">
+            Blade
           </button>
-          <button id="btnViewGpu" class="seg-btn" data-view="gpu" title="Explode GPU 3D View (Key 4)">
-            <span class="seg-icon">🔬</span>
-            <span class="seg-text">Explode GPU</span>
-            <kbd>4</kbd>
+          <button id="btnViewGpu" class="seg-btn" data-view="gpu" title="RTX 4090 3D Explode (4)">
+            RTX 4090
           </button>
         </nav>
 
-        <!-- Minimal Icon Utility Buttons (Right) -->
+        <!-- Minimal Icon Toggles (Right) -->
         <div class="top-actions">
-          <button id="btnSoundToggle" class="icon-chip-btn" aria-label="Toggle Datacenter Audio" title="Toggle Datacenter Sound (Key S)">
-            <span class="btn-icon" id="soundIcon">🔇</span>
-            <span class="btn-label" id="soundText">Audio</span>
+          <button
+            id="btnSoundToggle"
+            class="icon-btn"
+            aria-label="Toggle Datacenter Audio"
+            title="Ambient Audio (S)"
+          >
+            <span id="soundIcon" aria-hidden="true">
+              <svg class="ui-icon icon-muted" viewBox="0 0 16 16" fill="none">
+                <path d="M2.5 6v4h2.8l3.2 2.8V3.2L5.3 6H2.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
+                <path d="M11 6l3 4M14 6l-3 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              </svg>
+              <svg class="ui-icon icon-unmuted" viewBox="0 0 16 16" fill="none">
+                <path d="M2.5 6v4h2.8l3.2 2.8V3.2L5.3 6H2.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
+                <path d="M11 5.6a3.4 3.4 0 010 4.8M12.8 3.8a6 6 0 010 8.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              </svg>
+            </span>
+            <span class="sr-only" id="soundText">Audio</span>
           </button>
-          <button id="btnAutoRotate" class="icon-chip-btn" aria-label="Toggle Auto Rotation" title="Auto Orbit Camera (Key O)">
-            <span class="btn-icon">⟳</span>
-            <span class="btn-label">Orbit</span>
+          <button
+            id="btnAutoRotate"
+            class="icon-btn"
+            aria-label="Toggle Auto Orbit"
+            title="Auto Orbit (O)"
+          >
+            <svg class="ui-icon icon-orbit" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M13.5 8a5.5 5.5 0 11-1.4-3.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              <path d="M12.5 2v2.7H9.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
           </button>
         </div>
       </header>
 
-      <!-- 3D Component Inspection Mode Floating Banner -->
+      <!-- Component Focus Floating Pill -->
       <div class="focus-mode-banner" id="focusModeBanner" aria-live="polite">
-        <div class="focus-banner-left">
-          <div class="focus-pulse-dot"></div>
-          <span class="focus-badge">Component Focus</span>
-          <span class="focus-title" id="focusTitle">Component Name</span>
-        </div>
-        <div class="focus-banner-actions">
-          <button class="focus-action-btn" id="btnFocusTurntable" title="Toggle 360° Turntable Orbit">
-            <span class="focus-btn-icon">⟳</span>
-            <span>Turntable</span>
-          </button>
-          <button class="focus-action-btn btn-exit-focus" id="btnExitFocus" title="Return to Overview (Esc)">
-            <span class="focus-btn-icon">✕</span>
-            <span>Return to Overview</span>
-            <kbd>Esc</kbd>
-          </button>
-        </div>
+        <span class="focus-dot" aria-hidden="true"></span>
+        <span class="focus-title" id="focusTitle">Component</span>
+        <span class="pill-divider" aria-hidden="true"></span>
+        <button class="focus-action-btn" id="btnFocusTurntable" title="Toggle 360° Turntable">
+          Orbit
+        </button>
+        <button class="focus-action-btn btn-exit-focus" id="btnExitFocus" title="Return to Overview (Esc)">
+          Done
+        </button>
       </div>
 
-      <!-- 3D Callout Badges Layer & Leader Lines (Projected from 3D world space) -->
+      <!-- 3D Callout Badges & Leader Lines -->
       <div id="callout-overlay" aria-hidden="true">
         <svg id="callout-lines" class="callout-lines-layer" xmlns="http://www.w3.org/2000/svg"></svg>
 
         <div class="callout-tag" id="tagFrontShroud" data-part="frontShroud">
           <span class="callout-num">1</span>
-          <div class="callout-content">
-            <div class="callout-text">Front Shroud</div>
-            <div class="callout-sub">Hourglass X-Frame &amp; RTX 4090</div>
-          </div>
+          <span class="callout-text">Front Shroud</span>
         </div>
 
         <div class="callout-tag" id="tagFrontFan" data-part="frontFan">
           <span class="callout-num">2</span>
-          <div class="callout-content">
-            <div class="callout-text">Axial Fan</div>
-            <div class="callout-sub">120mm Fluid Bearing Intake</div>
-          </div>
+          <span class="callout-text">Axial Fan</span>
         </div>
 
         <div class="callout-tag" id="tagFanFrame" data-part="fanFrame">
           <span class="callout-num">3</span>
-          <div class="callout-content">
-            <div class="callout-text">Fan Frame</div>
-            <div class="callout-sub">Structural Cast Bracket</div>
-          </div>
+          <span class="callout-text">Fan Frame</span>
         </div>
 
         <div class="callout-tag" id="tagHeatsink" data-part="heatsink">
           <span class="callout-num">4</span>
-          <div class="callout-content">
-            <div class="callout-text">Heatsink &amp; Heat Pipes</div>
-            <div class="callout-sub">Vapor Chamber &amp; 64 Fins</div>
-          </div>
+          <span class="callout-text">Vapor Heatsink</span>
         </div>
 
         <div class="callout-tag" id="tagPcb" data-part="pcb">
           <span class="callout-num">5</span>
-          <div class="callout-content">
-            <div class="callout-text">PCB &amp; GPU Core</div>
-            <div class="callout-sub">AD102 Die &amp; 24GB GDDR6X</div>
-          </div>
+          <span class="callout-text">PCB &amp; AD102 Die</span>
         </div>
 
         <div class="callout-tag" id="tagThermalPlate" data-part="thermalPlate">
           <span class="callout-num">6</span>
-          <div class="callout-content">
-            <div class="callout-text">Thermal Midplate</div>
-            <div class="callout-sub">Die-Cast Stiffener Frame</div>
-          </div>
+          <span class="callout-text">Thermal Midplate</span>
         </div>
 
         <div class="callout-tag" id="tagBackplate" data-part="backplate">
           <span class="callout-num">7</span>
-          <div class="callout-content">
-            <div class="callout-text">Backplate</div>
-            <div class="callout-sub">Anodized Alloy &amp; X-Bracket</div>
-          </div>
+          <span class="callout-text">Backplate</span>
         </div>
 
         <div class="callout-tag" id="tagRearShroud" data-part="rearShroud">
           <span class="callout-num">8</span>
-          <div class="callout-content">
-            <div class="callout-text">Rear Shroud &amp; Fan</div>
-            <div class="callout-sub">Flow-Through Exhaust System</div>
-          </div>
+          <span class="callout-text">Rear Shroud</span>
         </div>
       </div>
 
-      <!-- Component Technical Specification Card -->
+      <!-- Minimal Technical Specification Card -->
       <aside class="part-card" id="partCard" aria-label="Component specifications">
         <div class="part-card-header">
-          <div class="part-card-badge" id="partCardBadge">Part 1</div>
-          <button class="part-card-close" id="partCardClose" aria-label="Close card">&times;</button>
+          <span class="part-card-badge" id="partCardBadge">Part 1</span>
+          <button class="part-card-close" id="partCardClose" aria-label="Close">
+            <svg class="ui-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+          </button>
         </div>
-        <h2 class="part-card-title" id="partCardTitle">Component Specifications</h2>
-        <p class="part-card-body" id="partCardBody">Select any component to view detailed engineering parameters.</p>
-        
+        <h2 class="part-card-title" id="partCardTitle">Component</h2>
+        <p class="part-card-body" id="partCardBody">Select any component to inspect engineering specs.</p>
+
         <div class="part-card-stats" id="partCardStats">
           <div class="stat-item">
             <span class="stat-label">Material</span>
@@ -188,129 +170,97 @@
             <span class="stat-value" id="statDimensions">-</span>
           </div>
           <div class="stat-item">
-            <span class="stat-label">Cooling &amp; Power</span>
+            <span class="stat-label">Thermal</span>
             <span class="stat-value" id="statCooling">-</span>
           </div>
         </div>
-        <div class="part-card-footer">
-          <button id="btnCardExitFocus" class="card-focus-return-btn" title="Return to Overview (Esc)">
-            <span>←</span> Return to Overview
-          </button>
-        </div>
+        <button id="btnCardExitFocus" class="card-focus-return-btn" title="Return to Overview (Esc)">
+          Return to Overview
+        </button>
       </aside>
 
-      <!-- WebGL Canvas -->
+      <!-- Full-Bleed WebGL Canvas -->
       <canvas id="scene-canvas"></canvas>
 
-      <!-- Contextual Bottom Dock -->
+      <!-- Minimal Contextual Bottom Dock -->
       <div class="bottom-dock" id="bottomDock">
-        <!-- 1. Facility Aisle View Hint (Shown ONLY in Facility View) -->
+        <!-- 1. Facility Hint -->
         <div class="facility-hint-pill" id="facilityHint">
-          <span class="hint-icon">💡</span>
-          <span class="hint-text">Click any rack to zoom in, or select views from the top navigation</span>
+          Click Rack 04 to inspect · Drag to orbit · Scroll to zoom
         </div>
 
-        <!-- 2. Server Rack & Blade Contextual Controls (Shown in Rack & Blade Views) -->
+        <!-- 2. Rack & Blade Minimal Controls -->
         <div class="rack-control-bar" id="facilityControlBar">
-          <div class="rack-action-buttons">
-            <button id="btnToggleDoor" class="action-btn" title="Toggle Rack 04 Door (Key D)">
-              <span class="action-btn-icon">🚪</span>
-              <span class="action-btn-text" id="doorBtnText">Open Door</span>
-              <kbd>D</kbd>
-            </button>
-            <button id="btnToggleTray" class="action-btn" title="Toggle 4U Blade Sled Extension (Key T)">
-              <span class="action-btn-icon">⇲</span>
-              <span class="action-btn-text" id="trayBtnText">Slide Tray</span>
-              <kbd>T</kbd>
-            </button>
-          </div>
+          <button id="btnToggleDoor" class="dock-btn" title="Toggle Rack Door (D)">
+            <span class="btn-led" aria-hidden="true"></span>
+            <span id="doorBtnText">Open Door</span>
+          </button>
+          <button id="btnToggleTray" class="dock-btn" title="Toggle Compute Tray (T)">
+            <span class="btn-led" aria-hidden="true"></span>
+            <span id="trayBtnText">Slide Tray</span>
+          </button>
+
+          <span class="pill-divider" aria-hidden="true"></span>
 
           <div class="camera-presets-group" id="camPresetsGroup">
-            <span class="presets-label">Preset:</span>
             <button id="btnCamAisle" class="cam-preset-btn active" data-cam="aisle">Aisle</button>
-            <button id="btnCamFlythrough" class="cam-preset-btn" data-cam="flythrough">Flythrough</button>
-            <button id="btnCamRack" class="cam-preset-btn" data-cam="rack">Rack Front</button>
-            <button id="btnCamBlade" class="cam-preset-btn" data-cam="blade">Blade Top</button>
+            <button id="btnCamFlythrough" class="cam-preset-btn" data-cam="flythrough">Fly</button>
+            <button id="btnCamRack" class="cam-preset-btn" data-cam="rack">Front</button>
+            <button id="btnCamBlade" class="cam-preset-btn" data-cam="blade">Top</button>
           </div>
         </div>
 
-        <!-- 3. GPU Explode View Panel (Shown ONLY in Explode GPU View) -->
+        <!-- 3. GPU Explode Minimal Controls -->
         <div class="hud-panel" id="gpuExplodePanel">
           <div class="hud-main-row">
-            <!-- Primary Explode Button -->
-            <button id="btnExplode" class="btn-explode-toggle" aria-pressed="false" title="Toggle GPU 3D Explosion (Spacebar)">
-              <span class="icon-explode">💥</span>
-              <span id="btnExplodeText">Explode View</span>
+            <button id="btnExplode" class="btn-explode-toggle" aria-pressed="false" title="Toggle Explode (Space)">
+              <span id="btnExplodeText">Explode</span>
             </button>
 
-            <!-- Explosion Distance Slider -->
             <div class="slider-group">
-              <span class="slider-label">Explosion</span>
-              <input 
-                type="range" 
-                id="explodeSlider" 
-                class="explode-slider" 
-                min="0" 
-                max="100" 
-                value="0" 
+              <input
+                type="range"
+                id="explodeSlider"
+                class="explode-slider"
+                min="0"
+                max="100"
+                value="0"
                 step="1"
                 aria-label="Explosion percentage"
               />
               <span class="slider-value" id="explodeValue">0%</span>
             </div>
 
-            <!-- Explode Mode switches: 3D Stack vs Linear View -->
             <div class="mode-switch-group" id="gpuExplodeModes">
-              <button id="btnMode3D" class="chip-btn active" title="3D Layered Depth Explode">
-                <span class="chip-icon">⇪</span>
-                <span class="chip-text">3D Stack</span>
-              </button>
-              <button id="btnModeLinear" class="chip-btn" title="Linear Blueprint Explode (1 to 8)">
-                <span class="chip-icon">⇥</span>
-                <span class="chip-text">Linear View</span>
-              </button>
+              <button id="btnMode3D" class="chip-btn active" title="3D Layered Stack (M)">3D</button>
+              <button id="btnModeLinear" class="chip-btn" title="Linear Blueprint (M)">Linear</button>
             </div>
+
+            <button id="btnResetView" class="icon-btn icon-btn-inline" title="Reset View (R)" aria-label="Reset View">
+              <svg class="ui-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 8a5 5 0 101.4-3.5L3 6M3 2.5V6h3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
           </div>
 
-          <!-- Secondary Row: Presets & Numbered Part Selectors -->
           <div class="hud-secondary-row">
             <div class="preset-group">
-              <button class="preset-btn active" data-preset="0">Assembled</button>
+              <button class="preset-btn active" data-preset="0">0%</button>
               <button class="preset-btn" data-preset="50">50%</button>
-              <button class="preset-btn" data-preset="100">Exploded</button>
+              <button class="preset-btn" data-preset="100">100%</button>
             </div>
 
-            <!-- Numbered Part Quick-Selector Strip (1 to 8) -->
-            <div class="parts-quick-strip" title="Directly inspect card components 1 to 8">
-              <button class="part-pill" data-part="frontShroud" title="1. Front Shroud">1</button>
-              <button class="part-pill" data-part="frontFan" title="2. Axial Fan">2</button>
-              <button class="part-pill" data-part="fanFrame" title="3. Fan Frame">3</button>
-              <button class="part-pill" data-part="heatsink" title="4. Heatsink">4</button>
-              <button class="part-pill" data-part="pcb" title="5. PCB">5</button>
-              <button class="part-pill" data-part="thermalPlate" title="6. Thermal Plate">6</button>
-              <button class="part-pill" data-part="backplate" title="7. Backplate">7</button>
-              <button class="part-pill" data-part="rearShroud" title="8. Rear Shroud">8</button>
-            </div>
-
-            <div class="util-group">
-              <button id="btnResetView" class="util-btn" title="Reset Camera and View (Key R)">
-                <span>↺</span> Reset View
-              </button>
+            <div class="parts-quick-strip" title="Inspect components 1–8">
+              <button class="part-pill" data-part="frontShroud" title="1 · Front Shroud">1</button>
+              <button class="part-pill" data-part="frontFan" title="2 · Axial Fan">2</button>
+              <button class="part-pill" data-part="fanFrame" title="3 · Fan Frame">3</button>
+              <button class="part-pill" data-part="heatsink" title="4 · Vapor Heatsink">4</button>
+              <button class="part-pill" data-part="pcb" title="5 · PCB &amp; Die">5</button>
+              <button class="part-pill" data-part="thermalPlate" title="6 · Thermal Midplate">6</button>
+              <button class="part-pill" data-part="backplate" title="7 · Backplate">7</button>
+              <button class="part-pill" data-part="rearShroud" title="8 · Rear Shroud">8</button>
             </div>
           </div>
-        </div>
-
-        <!-- Clean, Compact Hotkey Hints -->
-        <div class="hotkey-hints" id="hotkeyHints">
-          <span><kbd>1</kbd>–<kbd>4</kbd> Views</span>
-          <span>•</span>
-          <span><kbd>D</kbd> Door</span>
-          <span>•</span>
-          <span><kbd>T</kbd> Tray</span>
-          <span>•</span>
-          <span><kbd>Space</kbd> Explode</span>
-          <span>•</span>
-          <span><kbd>Esc</kbd> Exit Focus</span>
         </div>
       </div>
     </main>
@@ -322,6 +272,6 @@
         }
       }
     </script>
-    <script type="module" src="./main.js?v=15"></script>
+    <script type="module" src="./main.js?v=19"></script>
   </body>
 </html>

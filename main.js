@@ -1,7 +1,8 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js";
+import * as THREE from "three";
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/controls/OrbitControls.js";
 import { RoundedBoxGeometry } from "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { createServerRoom } from "./serverRoom.js";
+import { createRtx4090Card } from "./rtx4090Card.js";
 
 // ============================================================================
 // DOM Elements
@@ -188,20 +189,19 @@ const audioSystem = new DatacenterAudio();
 if (btnSoundToggle) {
   btnSoundToggle.addEventListener("click", () => {
     const isPlaying = audioSystem.toggle();
-    if (soundIcon) soundIcon.textContent = isPlaying ? "🔊" : "🔇";
     if (soundText) soundText.textContent = isPlaying ? "Audio On" : "Audio";
     btnSoundToggle.classList.toggle("active", isPlaying);
   });
 }
 
 // ============================================================================
-// Three.js Scene Setup (Photorealistic Light-Themed Cleanroom Datacenter)
+// Three.js Scene Setup (High-FPS Photorealistic Cleanroom & Studio IBL)
 // ============================================================================
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xeef3f8);
-scene.fog = new THREE.Fog(0xdce6f2, 45, 200);
+scene.background = new THREE.Color(0xedf1f6);
+scene.fog = new THREE.Fog(0xe2e8f0, 70, 230);
 
-const camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.1, 400);
+const camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.1, 360);
 
 const renderer = new THREE.WebGLRenderer({
   canvas,
@@ -209,50 +209,69 @@ const renderer = new THREE.WebGLRenderer({
   alpha: false,
   powerPreference: "high-performance",
 });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.75;
+renderer.toneMappingExposure = 1.15;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
+// Procedural Studio Softbox Environment Map (realistic metallic reflections, zero extra lights)
+function createStudioEnvMap(r) {
+  const pmrem = new THREE.PMREMGenerator(r);
+  const envScene = new THREE.Scene();
+  envScene.background = new THREE.Color(0xe8eef5);
+  const panelMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  const warmMat = new THREE.MeshBasicMaterial({ color: 0xf7f1e3 });
+  const coolMat = new THREE.MeshBasicMaterial({ color: 0xdbeafe });
+  const topPanel = new THREE.Mesh(new THREE.PlaneGeometry(18, 18), panelMat);
+  topPanel.position.set(0, 8, 0);
+  topPanel.rotation.x = Math.PI / 2;
+  envScene.add(topPanel);
+  const sideL = new THREE.Mesh(new THREE.PlaneGeometry(14, 8), warmMat);
+  sideL.position.set(-9, 2, 2);
+  sideL.rotation.y = Math.PI / 2;
+  envScene.add(sideL);
+  const sideR = new THREE.Mesh(new THREE.PlaneGeometry(14, 8), coolMat);
+  sideR.position.set(9, 2, -2);
+  sideR.rotation.y = -Math.PI / 2;
+  envScene.add(sideR);
+  const tex = pmrem.fromScene(envScene, 0.04).texture;
+  pmrem.dispose();
+  return tex;
+}
+scene.environment = createStudioEnvMap(renderer);
+
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-controls.dampingFactor = 0.055;
+controls.dampingFactor = 0.06;
 controls.enablePan = true;
 controls.minDistance = 1.5;
 controls.maxDistance = 220;
 controls.autoRotate = false;
 controls.autoRotateSpeed = 0.7;
 
-// Bright Cleanroom Datacenter Illumination Rig
-const ambientLight = new THREE.AmbientLight(0xffffff, 1.8);
-scene.add(ambientLight);
-
-const hemiLight = new THREE.HemisphereLight(0xffffff, 0xc0d0e4, 1.6);
-hemiLight.position.set(0, 50, 0);
+// Streamlined 3-Light Studio Illumination Rig (locked 60 FPS)
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0xcbd5e1, 1.15);
+hemiLight.position.set(0, 60, 0);
 scene.add(hemiLight);
 
-const aisleKeyLight = new THREE.DirectionalLight(0xffffff, 1.8);
-aisleKeyLight.position.set(5, 55, 30);
+const aisleKeyLight = new THREE.DirectionalLight(0xffffff, 1.35);
+aisleKeyLight.position.set(14, 64, 34);
 aisleKeyLight.castShadow = true;
-aisleKeyLight.shadow.mapSize.set(2048, 2048);
-aisleKeyLight.shadow.bias = -0.0002;
+aisleKeyLight.shadow.mapSize.set(1024, 1024);
+aisleKeyLight.shadow.bias = -0.0004;
 scene.add(aisleKeyLight);
 
-const aisleKeyLight2 = new THREE.DirectionalLight(0xf0f6ff, 1.4);
-aisleKeyLight2.position.set(-5, 55, -30);
-scene.add(aisleKeyLight2);
-
-const floorBounceLight = new THREE.DirectionalLight(0x38bdf8, 0.9);
-floorBounceLight.position.set(0, -10, 0);
-scene.add(floorBounceLight);
+const fillLight = new THREE.DirectionalLight(0xeef6ff, 0.65);
+fillLight.position.set(-18, 42, -26);
+scene.add(fillLight);
 
 const clock = new THREE.Clock();
 const pointer = new THREE.Vector2(0, 0);
 const raycaster = new THREE.Raycaster();
-const interactiveMeshes = [];
-const groupTransformData = new Map();
+let interactiveMeshes = [];
+let groupTransformData = new Map();
 let partGroupByKey = {};
 let heroSpotlight = null;
 
@@ -350,585 +369,19 @@ const ghostMaterial = new THREE.MeshStandardMaterial({
 const datacenter = createServerRoom(scene, { addLights: true });
 
 // ============================================================================
-// Textures Generation (NVIDIA Typography & Dies)
-// ============================================================================
-function createRtx4090Texture() {
-  const c = document.createElement("canvas");
-  c.width = 1024;
-  c.height = 512;
-  const ctx = c.getContext("2d");
-  ctx.fillStyle = "#141518";
-  ctx.fillRect(0, 0, c.width, c.height);
-
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
-  ctx.lineWidth = 2;
-  for (let i = -512; i < 1500; i += 16) {
-    ctx.beginPath();
-    ctx.moveTo(i, 0);
-    ctx.lineTo(i + 400, 512);
-    ctx.stroke();
-  }
-
-  ctx.fillStyle = "#e2e5e9";
-  ctx.font = "700 100px -apple-system, BlinkMacSystemFont, 'Inter', sans-serif";
-  ctx.fillText("RTX 4090", 110, 260);
-
-  ctx.fillStyle = "#8a92a0";
-  ctx.font = "500 28px -apple-system, BlinkMacSystemFont, 'Inter', sans-serif";
-  ctx.fillText("Founders Edition • 24 GB GDDR6X", 112, 318);
-
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}
-
-function createGeforceLogoTexture() {
-  const c = document.createElement("canvas");
-  c.width = 1024;
-  c.height = 128;
-  const ctx = c.getContext("2d");
-  ctx.fillStyle = "#0c0d10";
-  ctx.fillRect(0, 0, c.width, c.height);
-
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "700 56px -apple-system, BlinkMacSystemFont, 'Inter', sans-serif";
-  ctx.fillText("GEFORCE RTX", 60, 84);
-
-  ctx.fillStyle = "#76b900";
-  ctx.fillRect(495, 34, 10, 58);
-
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}
-
-function createGpuDieTexture() {
-  const c = document.createElement("canvas");
-  c.width = 1024;
-  c.height = 1024;
-  const ctx = c.getContext("2d");
-
-  ctx.fillStyle = "#1b2128";
-  ctx.fillRect(0, 0, c.width, c.height);
-
-  ctx.strokeStyle = "rgba(77, 182, 172, 0.18)";
-  ctx.lineWidth = 1;
-  for (let x = 0; x < c.width; x += 16) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, c.height);
-    ctx.stroke();
-  }
-  for (let y = 0; y < c.height; y += 16) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(c.width, y);
-    ctx.stroke();
-  }
-
-  ctx.strokeStyle = "#76b900";
-  ctx.lineWidth = 8;
-  ctx.strokeRect(120, 120, 784, 784);
-
-  ctx.fillStyle = "#76b900";
-  ctx.beginPath();
-  ctx.arc(512, 430, 90, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = "#1b2128";
-  ctx.beginPath();
-  ctx.arc(512, 430, 55, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "700 64px -apple-system, BlinkMacSystemFont, 'Inter', sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText("NVIDIA", 512, 590);
-
-  ctx.fillStyle = "#9ca3af";
-  ctx.font = "500 30px -apple-system, BlinkMacSystemFont, 'Inter', sans-serif";
-  ctx.fillText("AD102-300-A1", 512, 648);
-  ctx.font = "400 24px -apple-system, BlinkMacSystemFont, 'Inter', sans-serif";
-  ctx.fillText("Ada Lovelace Architecture", 512, 696);
-
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}
-
-function createBackplateXTexture() {
-  const c = document.createElement("canvas");
-  c.width = 1024;
-  c.height = 512;
-  const ctx = c.getContext("2d");
-  ctx.fillStyle = "#151619";
-  ctx.fillRect(0, 0, c.width, c.height);
-
-  ctx.strokeStyle = "rgba(194, 181, 155, 0.45)";
-  ctx.lineWidth = 6;
-  ctx.beginPath();
-  ctx.moveTo(80, 40);
-  ctx.lineTo(944, 472);
-  ctx.moveTo(944, 40);
-  ctx.lineTo(80, 472);
-  ctx.stroke();
-
-  ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
-  ctx.font = "700 32px 'Inter', sans-serif";
-  ctx.fillText("RTX 4090", 120, 420);
-
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}
-
-// ============================================================================
-// Materials Palette (Authentic RTX 4090 Founders Edition)
-// ============================================================================
-const palette = {
-  champagne: new THREE.MeshPhysicalMaterial({
-    color: 0xd6ccb4,
-    metalness: 0.88,
-    roughness: 0.22,
-    clearcoat: 0.65,
-    clearcoatRoughness: 0.16,
-  }),
-  matteBlack: new THREE.MeshPhysicalMaterial({
-    color: 0x242830,
-    metalness: 0.26,
-    roughness: 0.4,
-  }),
-  graphite: new THREE.MeshStandardMaterial({ color: 0x343942, metalness: 0.74, roughness: 0.26 }),
-  graphiteSoft: new THREE.MeshStandardMaterial({ color: 0x48505a, metalness: 0.65, roughness: 0.32 }),
-  finMetal: new THREE.MeshStandardMaterial({ color: 0x6e7885, metalness: 0.85, roughness: 0.24 }),
-  finMetalDark: new THREE.MeshStandardMaterial({ color: 0x444b54, metalness: 0.8, roughness: 0.3 }),
-  copper: new THREE.MeshStandardMaterial({ color: 0xe37d48, metalness: 0.94, roughness: 0.16 }),
-  pcb: new THREE.MeshStandardMaterial({ color: 0x134832, metalness: 0.25, roughness: 0.48 }),
-  pcbTrace: new THREE.MeshStandardMaterial({ color: 0x5cd3d8, metalness: 0.6, roughness: 0.25 }),
-  siliconDie: new THREE.MeshPhysicalMaterial({
-    map: createGpuDieTexture(),
-    metalness: 0.96,
-    roughness: 0.08,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.05,
-  }),
-  vramChip: new THREE.MeshStandardMaterial({ color: 0x252930, metalness: 0.58, roughness: 0.26 }),
-  gold: new THREE.MeshStandardMaterial({ color: 0xe5b44c, metalness: 0.98, roughness: 0.12 }),
-  thermalPad: new THREE.MeshStandardMaterial({ color: 0x3d8ca8, roughness: 0.78, metalness: 0.1 }),
-  steel: new THREE.MeshStandardMaterial({ color: 0x9ea9b4, metalness: 0.94, roughness: 0.18 }),
-  fanBlade: new THREE.MeshPhysicalMaterial({
-    color: 0x272c34,
-    metalness: 0.42,
-    roughness: 0.26,
-    clearcoat: 0.5,
-  }),
-  fanHubSpinner: new THREE.MeshStandardMaterial({ color: 0xabb5bf, metalness: 0.92, roughness: 0.16 }),
-  geforceGlow: new THREE.MeshBasicMaterial({
-    map: createGeforceLogoTexture(),
-  }),
-  blueGlow: new THREE.MeshStandardMaterial({
-    color: 0x76b900,
-    emissive: 0x4a7c00,
-    emissiveIntensity: 1.8,
-  }),
-};
-
-// ============================================================================
-// Explosion State & Dual Modes
+// Explosion State & Modular Photorealistic RTX 4090 Mounting
 // ============================================================================
 let explosionTarget = 0.0;
 let explosionProgress = 0.0;
 let explodeMode = "3d"; // "3d" or "linear"
+let cardShowcaseFactor = 0.0;
 
-function addMesh(parent, geometry, material, position = [0, 0, 0], rotation = [0, 0, 0]) {
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(...position);
-  mesh.rotation.set(...rotation);
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  parent.add(mesh);
-  interactiveMeshes.push(mesh);
-  return mesh;
-}
-
-function rememberPartTransform(object, stackPos, linearPos) {
-  groupTransformData.set(object, {
-    normal: object.position.clone(),
-    stack: new THREE.Vector3(...stackPos),
-    linear: new THREE.Vector3(...linearPos),
-  });
-}
-
-// ============================================================================
-// 120mm Axial Flow Fan Assembly
-// ============================================================================
-function createAxialFan(parent, isFront = true) {
-  const fanGroup = new THREE.Group();
-  parent.add(fanGroup);
-
-  const outerRing = new THREE.Mesh(new THREE.TorusGeometry(1.68, 0.06, 16, 64), palette.fanBlade);
-  outerRing.rotation.x = Math.PI / 2;
-  outerRing.castShadow = true;
-  fanGroup.add(outerRing);
-
-  const bladeGroup = new THREE.Group();
-  fanGroup.add(bladeGroup);
-  for (let i = 0; i < 7; i += 1) {
-    const angle = (i / 7) * Math.PI * 2;
-    const blade = new THREE.Mesh(
-      new THREE.BoxGeometry(0.34, 0.06, 1.35),
-      palette.fanBlade,
-    );
-    blade.position.set(Math.sin(angle) * 0.75, 0, Math.cos(angle) * 0.75);
-    blade.rotation.y = angle + (isFront ? 0.42 : -0.42);
-    blade.rotation.x = isFront ? 0.15 : -0.15;
-    blade.castShadow = true;
-    bladeGroup.add(blade);
-  }
-
-  const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.58, 0.24, 48), palette.matteBlack);
-  hub.castShadow = true;
-  fanGroup.add(hub);
-
-  const centerCap = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.38, 0.06, 36), palette.fanHubSpinner);
-  centerCap.position.y = isFront ? 0.13 : -0.13;
-  fanGroup.add(centerCap);
-
-  fanGroup.userData = { bladeGroup, isFront };
-  return fanGroup;
-}
-
-// ============================================================================
-// The 8 Authentic RTX 4090 Assemblies (Ref Blueprint 1 to 8)
-// ============================================================================
-
-// PART 1: FRONT SHROUD (Hourglass X-Frame & RTX 4090 Inscription)
-function createPart1FrontShroud(card) {
-  const group = new THREE.Group();
-  group.position.set(0, 0.98, 0);
-  card.add(group);
-  rememberPartTransform(group, [0, 4.4, 0.3], [-14.0, 0, 0]);
-
-  addMesh(group, new RoundedBoxGeometry(10.0, 0.22, 4.5, 0.25, 6), palette.champagne, [0, 0, 0]);
-  addMesh(group, new RoundedBoxGeometry(9.6, 0.1, 4.1, 0.18, 5), palette.matteBlack, [0, 0.08, 0]);
-
-  const rtxTexture = createRtx4090Texture();
-  const rtxMat = new THREE.MeshBasicMaterial({ map: rtxTexture, side: THREE.DoubleSide });
-  const rtxPlate = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 2.8), rtxMat);
-  rtxPlate.rotation.x = -Math.PI / 2;
-  rtxPlate.position.set(-2.45, 0.14, 0);
-  group.add(rtxPlate);
-
-  const intakeWell = new THREE.Mesh(new THREE.CylinderGeometry(1.78, 1.78, 0.12, 64), palette.matteBlack);
-  intakeWell.position.set(2.45, 0.08, 0);
-  group.add(intakeWell);
-
-  const rib1 = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.16, 5.2), palette.champagne);
-  rib1.rotation.y = 0.44;
-  rib1.position.y = 0.14;
-  group.add(rib1);
-
-  const rib2 = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.16, 5.2), palette.champagne);
-  rib2.rotation.y = -0.44;
-  rib2.position.y = 0.14;
-  group.add(rib2);
-
-  group.userData = { partKey: "frontShroud", partNum: 1 };
-  return group;
-}
-
-// PART 2: AXIAL FAN (120mm Fluid-Dynamic Bearing Intake Fan)
-function createPart2AxialFan(card) {
-  const group = new THREE.Group();
-  group.position.set(2.45, 0.82, 0);
-  card.add(group);
-  rememberPartTransform(group, [2.45, 3.4, 0.2], [-10.0, 0, 0]);
-
-  const fan = createAxialFan(group, true);
-  group.userData = { fan, partKey: "frontFan", partNum: 2 };
-  return group;
-}
-
-// PART 3: FAN FRAME (Structural Inner Cast Skeleton)
-function createPart3FanFrame(card) {
-  const group = new THREE.Group();
-  group.position.set(2.45, 0.52, 0);
-  card.add(group);
-  rememberPartTransform(group, [2.45, 2.4, 0.1], [-6.0, 0, 0]);
-
-  addMesh(group, new THREE.CylinderGeometry(1.82, 1.82, 0.18, 48, 1, true), palette.graphite, [0, 0, 0]);
-
-  for (let i = 0; i < 4; i += 1) {
-    const angle = (i / 4) * Math.PI * 2 + Math.PI / 4;
-    const strut = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 1.7), palette.graphite);
-    strut.position.set(Math.sin(angle) * 0.85, 0, Math.cos(angle) * 0.85);
-    strut.rotation.y = angle;
-    group.add(strut);
-  }
-
-  addMesh(group, new THREE.CylinderGeometry(0.68, 0.68, 0.16, 32), palette.matteBlack, [0, 0, 0]);
-  addMesh(group, new THREE.TorusGeometry(0.55, 0.04, 10, 32), palette.gold, [0, 0, 0], [Math.PI / 2, 0, 0]);
-
-  group.userData = { partKey: "fanFrame", partNum: 3 };
-  return group;
-}
-
-// PART 4: HEATSINK (Dual Fin-Stack Radiator & Sintered Heat Pipes)
-function createPart4Heatsink(card) {
-  const group = new THREE.Group();
-  group.position.set(0, 0.22, 0);
-  card.add(group);
-  rememberPartTransform(group, [0, 1.4, 0], [-2.0, 0, 0]);
-
-  addMesh(group, new RoundedBoxGeometry(5.2, 0.22, 4.2, 0.08, 4), palette.copper, [-1.8, -0.22, 0]);
-
-  for (let i = 0; i < 42; i += 1) {
-    const x = -4.5 + i * 0.11;
-    const fin = new THREE.Mesh(new THREE.BoxGeometry(0.035, 1.05, 4.15), palette.finMetal);
-    fin.position.set(x, 0.35, 0);
-    group.add(fin);
-  }
-
-  for (let i = 0; i < 32; i += 1) {
-    const x = 0.5 + i * 0.13;
-    const fin = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.9, 4.15), palette.finMetalDark);
-    fin.position.set(x, 0.35, 0);
-    group.add(fin);
-  }
-
-  for (let p = 0; p < 4; p += 1) {
-    const zOffset = -1.4 + p * 0.92;
-    const pipe = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.12, 0.12, 9.2, 16),
-      palette.copper,
-    );
-    pipe.rotation.z = Math.PI / 2;
-    pipe.position.set(0, -0.08, zOffset);
-    group.add(pipe);
-  }
-
-  group.userData = { partKey: "heatsink", partNum: 4 };
-  return group;
-}
-
-// PART 5: PCB (V-Notched Board, AD102 Silicon Die & Micron GDDR6X)
-function createPart5Pcb(card) {
-  const group = new THREE.Group();
-  group.position.set(-1.0, -0.05, 0);
-  card.add(group);
-  rememberPartTransform(group, [-1.0, 0.2, 0], [2.0, 0, 0]);
-
-  addMesh(group, new RoundedBoxGeometry(7.2, 0.12, 4.15, 0.08, 4), palette.pcb, [0, 0, 0]);
-  addMesh(group, new RoundedBoxGeometry(1.68, 0.12, 1.68, 0.04, 4), palette.siliconDie, [-0.6, 0.1, 0]);
-  addMesh(group, new THREE.BoxGeometry(1.95, 0.08, 1.95), palette.steel, [-0.6, 0.06, 0]);
-
-  const vramPositions = [
-    [-1.9, 0.08, -1.2], [-1.9, 0.08, -0.4], [-1.9, 0.08, 0.4], [-1.9, 0.08, 1.2],
-    [0.7, 0.08, -1.2],  [0.7, 0.08, -0.4],  [0.7, 0.08, 0.4],  [0.7, 0.08, 1.2],
-    [-1.1, 0.08, -1.55], [-0.3, 0.08, -1.55],
-    [-1.1, 0.08, 1.55],  [-0.3, 0.08, 1.55],
-  ];
-  vramPositions.forEach(([x, y, z]) => {
-    addMesh(group, new THREE.BoxGeometry(0.48, 0.06, 0.62), palette.vramChip, [x, y, z]);
-  });
-
-  for (let i = 0; i < 14; i += 1) {
-    const z = -1.7 + i * 0.26;
-    addMesh(group, new THREE.BoxGeometry(0.32, 0.18, 0.22), palette.graphite, [1.8, 0.1, z]);
-    addMesh(group, new THREE.CylinderGeometry(0.08, 0.08, 0.16, 12), palette.steel, [2.3, 0.1, z]);
-  }
-
-  for (let t = 0; t < 6; t += 1) {
-    const tr = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.02, 0.05), palette.pcbTrace);
-    tr.position.set(0.6, 0.07, -1.3 + t * 0.52);
-    group.add(tr);
-  }
-
-  group.userData = { partKey: "pcb", partNum: 5 };
-  return group;
-}
-
-// PART 6: THERMAL MIDPLATE (Die-Cast Aluminum Heat Spreader & Blue Pads)
-function createPart6ThermalPlate(card) {
-  const group = new THREE.Group();
-  group.position.set(-1.0, -0.25, 0);
-  card.add(group);
-  rememberPartTransform(group, [-1.0, -1.1, 0], [6.0, 0, 0]);
-
-  addMesh(group, new RoundedBoxGeometry(7.4, 0.16, 4.25, 0.08, 4), palette.graphiteSoft, [0, 0, 0]);
-
-  const padLayout = [
-    [-1.9, 0.1, -1.2], [-1.9, 0.1, 0.4], [0.7, 0.1, -0.4], [0.7, 0.1, 1.2],
-    [-0.6, 0.1, 0], [1.8, 0.1, 0],
-  ];
-  padLayout.forEach(([x, y, z]) => {
-    addMesh(group, new THREE.BoxGeometry(0.55, 0.05, 0.7), palette.thermalPad, [x, y, z]);
-  });
-
-  group.userData = { partKey: "thermalPlate", partNum: 6 };
-  return group;
-}
-
-// PART 7: BACKPLATE (Obsidian Armor, X-Truss Lines & Retention Clamp)
-function createPart7Backplate(card) {
-  const group = new THREE.Group();
-  group.position.set(0, -0.68, 0);
-  card.add(group);
-  rememberPartTransform(group, [0, -2.4, -0.1], [10.0, 0, 0]);
-
-  addMesh(group, new RoundedBoxGeometry(9.8, 0.14, 4.4, 0.22, 5), palette.matteBlack, [0, 0, 0]);
-
-  const xTexture = createBackplateXTexture();
-  const xMat = new THREE.MeshBasicMaterial({ map: xTexture, side: THREE.DoubleSide });
-  const xPlate = new THREE.Mesh(new THREE.PlaneGeometry(9.4, 4.1), xMat);
-  xPlate.rotation.x = Math.PI / 2;
-  xPlate.position.set(0, -0.08, 0);
-  group.add(xPlate);
-
-  const xClamp = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.08, 0.22), palette.steel);
-  xClamp.rotation.y = 0.785;
-  xClamp.position.set(-1.6, -0.09, 0);
-  group.add(xClamp);
-
-  const xClamp2 = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.08, 0.22), palette.steel);
-  xClamp2.rotation.y = -0.785;
-  xClamp2.position.set(-1.6, -0.09, 0);
-  group.add(xClamp2);
-
-  const cutout = new THREE.Mesh(new THREE.CylinderGeometry(1.75, 1.75, 0.22, 48), palette.graphite);
-  cutout.position.set(2.45, 0, 0);
-  group.add(cutout);
-
-  group.userData = { partKey: "backplate", partNum: 7 };
-  return group;
-}
-
-// PART 8: REAR SHROUD (Champagne Unibody & 120mm Rear Exhaust Fan)
-function createPart8RearShroud(card) {
-  const group = new THREE.Group();
-  group.position.set(0, -0.98, 0);
-  card.add(group);
-  rememberPartTransform(group, [0, -4.0, -0.2], [14.0, 0, 0]);
-
-  addMesh(group, new RoundedBoxGeometry(10.0, 0.18, 4.5, 0.25, 6), palette.champagne, [0, 0, 0]);
-  addMesh(group, new RoundedBoxGeometry(9.6, 0.08, 4.1, 0.18, 4), palette.matteBlack, [0, -0.08, 0]);
-
-  const rearFan = createAxialFan(group, false);
-  rearFan.position.set(2.45, -0.02, 0);
-
-  for (let i = 0; i < 9; i += 1) {
-    const x = -4.0 + i * 0.44;
-    const louver = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.24, 3.8), palette.champagne);
-    louver.position.set(x, 0, 0);
-    group.add(louver);
-  }
-
-  group.userData = { rearFan, partKey: "rearShroud", partNum: 8 };
-  return group;
-}
-
-// EXTERIOR INTERFACE: Stainless Steel Triple-Slot I/O Bracket
-function createIoBracket(card) {
-  const bracket = new THREE.Group();
-  bracket.position.set(-5.06, -0.15, 0);
-  card.add(bracket);
-  rememberPartTransform(bracket, [-7.2, 0, 0], [-17.5, 0, 0]);
-
-  addMesh(bracket, new RoundedBoxGeometry(0.12, 2.4, 4.3, 0.05, 3), palette.steel, [0, 0, 0]);
-
-  for (let i = 0; i < 3; i += 1) {
-    const z = -1.2 + i * 0.95;
-    addMesh(bracket, new THREE.BoxGeometry(0.18, 0.42, 0.62), palette.matteBlack, [-0.02, -0.35, z]);
-    addMesh(bracket, new THREE.BoxGeometry(0.04, 0.18, 0.38), palette.blueGlow, [-0.1, -0.35, z]);
-  }
-
-  addMesh(bracket, new THREE.BoxGeometry(0.18, 0.36, 0.68), palette.gold, [-0.02, 0.45, -0.4]);
-
-  for (let r = 0; r < 4; r += 1) {
-    for (let c = 0; c < 5; c += 1) {
-      const hex = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.16, 6), palette.graphite);
-      hex.rotation.z = Math.PI / 2;
-      hex.position.set(0, 0.2 + r * 0.24, 0.4 + c * 0.28);
-      bracket.add(hex);
-    }
-  }
-
-  bracket.userData = { partKey: "bracket" };
-  return bracket;
-}
-
-// EXTERIOR INTERFACE: PCIe 4.0 x16 Gold Fingers
-function createPcieConnector(card) {
-  const conn = new THREE.Group();
-  conn.position.set(0.6, -0.22, 2.32);
-  card.add(conn);
-  rememberPartTransform(conn, [0.6, -0.9, 3.8], [2.0, -2.5, 0]);
-
-  addMesh(conn, new RoundedBoxGeometry(5.2, 0.18, 0.32, 0.03, 3), palette.matteBlack, [0, 0, 0]);
-
-  for (let i = 0; i < 18; i += 1) {
-    addMesh(conn, new THREE.BoxGeometry(0.18, 0.16, 0.035), palette.gold, [-2.2 + i * 0.26, 0, 0.16]);
-  }
-
-  conn.userData = { partKey: "pcie" };
-  return conn;
-}
-
-// EXTERIOR INTERFACE: Illuminated GEFORCE RTX Logo & 16-Pin 12VHPWR Power
-function createTopLogoAndPower(card) {
-  const topGroup = new THREE.Group();
-  topGroup.position.set(0, 0, -2.26);
-  card.add(topGroup);
-  rememberPartTransform(topGroup, [0, 1.2, -3.8], [-2.0, 2.5, 0]);
-
-  const logoPlate = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 0.48), palette.geforceGlow);
-  logoPlate.position.set(1.8, 0.14, -0.02);
-  topGroup.add(logoPlate);
-
-  addMesh(topGroup, new RoundedBoxGeometry(0.9, 0.38, 0.26, 0.03, 3), palette.matteBlack, [-1.8, 0.12, -0.06]);
-  for (let r = 0; r < 2; r += 1) {
-    for (let c = 0; c < 6; c += 1) {
-      addMesh(topGroup, new THREE.BoxGeometry(0.04, 0.04, 0.03), palette.gold, [-2.1 + c * 0.12, 0.06 + r * 0.12, -0.19]);
-    }
-  }
-
-  topGroup.userData = { partKey: "power" };
-  return topGroup;
-}
-
-// ============================================================================
-// Dedicated RTX 4090 Card Lighting Rig (Attached to Mount Group)
-// ============================================================================
 function createCardStudioLighting(targetGroup) {
   const lightRig = new THREE.Group();
   lightRig.name = "CardInspectionLighting";
 
-  const keyLight = new THREE.DirectionalLight(0xffffff, 3.2);
-  keyLight.position.set(6, 14, 8);
-  lightRig.add(keyLight);
-
-  const fillLight = new THREE.DirectionalLight(0xe8f0fa, 2.2);
-  fillLight.position.set(-8, 8, 8);
-  lightRig.add(fillLight);
-
-  const underLight = new THREE.DirectionalLight(0xb0c4de, 1.8);
-  underLight.position.set(0, -8, 4);
-  lightRig.add(underLight);
-
-  const rimLight = new THREE.DirectionalLight(0x76b900, 1.4);
-  rimLight.position.set(-6, 6, -8);
-  lightRig.add(rimLight);
-
-  const topLight = new THREE.PointLight(0xffffff, 2.0, 30, 1.5);
-  topLight.position.set(0, 10, 0);
-  lightRig.add(topLight);
-
-  const internalGlow = new THREE.PointLight(0x6ee790, 2.6, 14, 2);
-  internalGlow.position.set(0, 0, 0);
-  lightRig.add(internalGlow);
-
   heroSpotlight = new THREE.SpotLight(0xffffff, 0, 45, Math.PI / 4, 0.45, 1.2);
   heroSpotlight.position.set(2, 16, 6);
-  heroSpotlight.castShadow = true;
   lightRig.add(heroSpotlight);
   lightRig.add(heroSpotlight.target);
 
@@ -936,73 +389,19 @@ function createCardStudioLighting(targetGroup) {
   return lightRig;
 }
 
-// ============================================================================
-// Master RTX 4090 Assembly & Datacenter Mounting
-// ============================================================================
-function createRtx4090Card() {
-  const card = new THREE.Group();
-  card.name = "RTX4090_FoundersEdition";
+// Build photorealistic RTX 4090 FE and mount to Hero Rack A04 4U compute sled
+const builtCard = createRtx4090Card({ RoundedBoxGeometry });
+const card = builtCard.card;
+partGroupByKey = builtCard.partGroupByKey;
+interactiveMeshes = builtCard.interactiveMeshes;
+groupTransformData = builtCard.groupTransformData;
 
-  const part1 = createPart1FrontShroud(card);
-  const part2 = createPart2AxialFan(card);
-  const part3 = createPart3FanFrame(card);
-  const part4 = createPart4Heatsink(card);
-  const part5 = createPart5Pcb(card);
-  const part6 = createPart6ThermalPlate(card);
-  const part7 = createPart7Backplate(card);
-  const part8 = createPart8RearShroud(card);
-
-  const bracket = createIoBracket(card);
-  const pcie = createPcieConnector(card);
-  const topBar = createTopLogoAndPower(card);
-
-  card.userData = {
-    part1,
-    part2,
-    part3,
-    part4,
-    part5,
-    part6,
-    part7,
-    part8,
-    bracket,
-    pcie,
-    topBar,
-  };
-
-  partGroupByKey = {
-    frontShroud: part1,
-    frontFan: part2,
-    fanFrame: part3,
-    heatsink: part4,
-    pcb: part5,
-    thermalPlate: part6,
-    backplate: part7,
-    rearShroud: part8,
-    bracket,
-    pcie,
-    power: topBar,
-  };
-
-  interactiveMeshes.length = 0;
-  card.traverse((child) => {
-    if (child.isMesh) {
-      interactiveMeshes.push(child);
-      child.userData.origMaterial = child.material;
-    }
-  });
-
-  return card;
-}
-
-// Build RTX 4090 card and mount it to the Hero Rack 4U compute blade tray
-const card = createRtx4090Card();
 const heroGpuMount = datacenter.getHeroGpuMount();
 heroGpuMount.group.add(card);
 card.position.set(0, 1.2, 0);
 card.rotation.set(0, 0, 0);
 
-// Attach dedicated card studio lighting rig to hero mount
+// Attach dedicated focus spotlight to hero mount
 createCardStudioLighting(heroGpuMount.group);
 
 function getPartKeyFromObject(obj) {
@@ -1447,8 +846,11 @@ function setExplosionTarget(target) {
 function updateUI() {
   const percent = Math.round(explosionTarget * 100);
 
-  if (explodeSlider && document.activeElement !== explodeSlider) {
-    explodeSlider.value = percent;
+  if (explodeSlider) {
+    if (document.activeElement !== explodeSlider) {
+      explodeSlider.value = percent;
+    }
+    explodeSlider.style.setProperty("--explode-pct", `${percent}%`);
   }
   if (explodeValue) {
     explodeValue.textContent = `${percent}%`;
@@ -1708,9 +1110,8 @@ function updateCallouts() {
   }
 
   activeItems.forEach((entry) => {
-    const { ax, ay, el, key, labelX, labelY } = entry;
-    el.style.left = `${labelX.toFixed(1)}px`;
-    el.style.top = `${labelY.toFixed(1)}px`;
+    const { item, ax, ay, el, key, labelX, labelY } = entry;
+    el.style.transform = `translate3d(${labelX.toFixed(1)}px, ${labelY.toFixed(1)}px, 0)`;
     el.classList.add("visible");
 
     const leader = leaderElements.get(key);
@@ -1719,11 +1120,12 @@ function updateCallouts() {
     leader.g.style.display = "block";
     leader.anchorCircle.setAttribute("cx", ax.toFixed(1));
     leader.anchorCircle.setAttribute("cy", ay.toFixed(1));
-    leader.pulseCircle.setAttribute("cx", ax.toFixed(1));
-    leader.pulseCircle.setAttribute("cy", ay.toFixed(1));
 
-    const tagMidY = labelY + 18;
-    const tagWidth = el.offsetWidth || 215;
+    if (!item.cachedWidth) {
+      item.cachedWidth = el.offsetWidth || 150;
+    }
+    const tagMidY = labelY + 14;
+    const tagWidth = item.cachedWidth;
 
     if (explodeMode === "3d") {
       if (labelX > ax) {
@@ -1743,7 +1145,7 @@ function updateCallouts() {
     } else {
       const tagMidX = labelX + tagWidth / 2;
       const isAbove = labelY < ay;
-      const targetY = isAbove ? labelY + 36 : labelY;
+      const targetY = isAbove ? labelY + 28 : labelY;
       const elbowY = ay + (targetY - ay) * 0.5;
       leader.path.setAttribute(
         "d",
@@ -1759,12 +1161,16 @@ function updateCallouts() {
 const partFocusProgressMap = new Map();
 const tempBasePos = new THREE.Vector3();
 const tempTargetPos = new THREE.Vector3();
+let lastDisplayedPct = -1;
 
 function animateParts() {
-  explosionProgress += (explosionTarget - explosionProgress) * 0.085;
+  explosionProgress += (explosionTarget - explosionProgress) * 0.1;
 
-  if (explodeValue) {
-    explodeValue.textContent = `${Math.round(explosionProgress * 100)}%`;
+  const pct = Math.round(explosionProgress * 100);
+  if (pct !== lastDisplayedPct) {
+    lastDisplayedPct = pct;
+    if (explodeValue) explodeValue.textContent = `${pct}%`;
+    if (explodeSlider) explodeSlider.style.setProperty("--explode-pct", `${pct}%`);
   }
 
   groupTransformData.forEach((data, object) => {
@@ -1837,9 +1243,23 @@ function animate() {
     }
   }
 
-  // 4. Subtle breathing float on card when in GPU mode
-  const hoverOffset = (currentViewMode === "gpu" && !focusedPartKey) ? Math.sin(elapsed * 0.7) * 0.03 : 0.0;
-  card.position.y = 1.2 + hoverOffset;
+  // 4. Smoothly lift & present the RTX 4090 out of the tray toward the viewer in GPU mode
+  const targetShowcase = currentViewMode === "gpu" ? 1.0 : 0.0;
+  cardShowcaseFactor += (targetShowcase - cardShowcaseFactor) * Math.min(1, delta * 5.5);
+
+  const hoverOffset = currentViewMode === "gpu" && !focusedPartKey ? Math.sin(elapsed * 0.9) * 0.08 : 0.0;
+  card.position.set(
+    THREE.MathUtils.lerp(0.0, 7.8, cardShowcaseFactor),
+    THREE.MathUtils.lerp(1.2, 7.6, cardShowcaseFactor) + hoverOffset,
+    THREE.MathUtils.lerp(0.0, 0.0, cardShowcaseFactor)
+  );
+  card.rotation.set(
+    THREE.MathUtils.lerp(0.0, 0.42, cardShowcaseFactor),
+    THREE.MathUtils.lerp(0.0, -0.18, cardShowcaseFactor),
+    THREE.MathUtils.lerp(0.0, -0.05, cardShowcaseFactor)
+  );
+  const showcaseScale = THREE.MathUtils.lerp(1.0, 1.24, cardShowcaseFactor);
+  card.scale.setScalar(showcaseScale);
 
   // 5. Front Intake Fan and Rear Exhaust Fan dynamic rotation
   if (card.userData.part2 && card.userData.part2.userData.fan) {
@@ -1849,37 +1269,42 @@ function animate() {
     card.userData.part8.userData.rearFan.userData.bladeGroup.rotation.y -= 0.024;
   }
 
-  // 6. Raycasting & Bidirectional Hover Highlight
-  raycaster.setFromCamera(pointer, camera);
-  const cardIntersections = raycaster.intersectObjects(interactiveMeshes, false);
-  let isHoveringInteractive = cardIntersections.length > 0;
-
-  if (!isHoveringInteractive && (currentViewMode === "facility" || currentViewMode === "rack")) {
-    const roomHits = raycaster.intersectObject(datacenter.group, true);
-    if (roomHits.length > 0) {
-      isHoveringInteractive = true;
-    }
-  }
-  canvas.style.cursor = isHoveringInteractive ? "pointer" : "grab";
-
-  let meshHoveredKey = null;
-  if (cardIntersections.length > 0) {
-    meshHoveredKey = getPartKeyFromObject(cardIntersections[0].object);
-  }
-
-  if (meshHoveredKey !== hoveredPartKey) {
-    hoveredPartKey = meshHoveredKey;
-    updateLeaderHighlight();
-  }
-
   renderer.render(scene, camera);
 }
 
 // ============================================================================
-// Event Handlers & Raycasting
+// Event Handlers & O(1) Throttled Raycasting (Zero Per-Frame Lag)
 // ============================================================================
 let pointerDownPos = { x: 0, y: 0 };
 let isDragMove = false;
+let lastHoverCheck = 0;
+
+function updateHoverState() {
+  raycaster.setFromCamera(pointer, camera);
+
+  if (currentViewMode === "gpu") {
+    const cardHits = raycaster.intersectObjects(interactiveMeshes, false);
+    canvas.style.cursor = cardHits.length > 0 ? "pointer" : "grab";
+    const meshHoveredKey = cardHits.length > 0 ? getPartKeyFromObject(cardHits[0].object) : null;
+    if (meshHoveredKey !== hoveredPartKey) {
+      hoveredPartKey = meshHoveredKey;
+      updateLeaderHighlight();
+    }
+    return;
+  }
+
+  if (hoveredPartKey) {
+    hoveredPartKey = null;
+    updateLeaderHighlight();
+  }
+
+  if ((currentViewMode === "facility" || currentViewMode === "rack") && datacenter.heroRack.hitProxy) {
+    const hits = raycaster.intersectObject(datacenter.heroRack.hitProxy, false);
+    canvas.style.cursor = hits.length > 0 ? "pointer" : "grab";
+  } else {
+    canvas.style.cursor = "grab";
+  }
+}
 
 canvas.addEventListener("pointerdown", (e) => {
   pointerDownPos = { x: e.clientX, y: e.clientY };
@@ -1897,10 +1322,17 @@ canvas.addEventListener("pointermove", (e) => {
   if (Math.hypot(dx, dy) > 5) {
     isDragMove = true;
   }
+
+  const now = performance.now();
+  if (now - lastHoverCheck > 60) {
+    lastHoverCheck = now;
+    updateHoverState();
+  }
 });
 
 canvas.addEventListener("pointerleave", () => {
   pointer.set(0, 0);
+  canvas.style.cursor = "grab";
 });
 
 // Interactive Raycasting Click
@@ -1909,16 +1341,18 @@ canvas.addEventListener("click", () => {
   raycaster.setFromCamera(pointer, camera);
 
   // 1. Intersect GPU Card Components
-  const hits = raycaster.intersectObjects(interactiveMeshes, true);
-  if (hits.length > 0) {
-    if (currentViewMode !== "gpu") {
-      switchViewMode("gpu");
-      return;
-    }
-    const key = getPartKeyFromObject(hits[0].object);
-    if (key) {
-      focusOnPart(key);
-      return;
+  if (currentViewMode === "gpu" || currentViewMode === "tray") {
+    const hits = raycaster.intersectObjects(interactiveMeshes, false);
+    if (hits.length > 0) {
+      if (currentViewMode !== "gpu") {
+        switchViewMode("gpu");
+        return;
+      }
+      const key = getPartKeyFromObject(hits[0].object);
+      if (key) {
+        focusOnPart(key);
+        return;
+      }
     }
   }
 
@@ -1929,18 +1363,15 @@ canvas.addEventListener("click", () => {
     return;
   }
 
-  // 3. Intersect Server Room Infrastructure (Rack / Tray Zoom)
-  if (currentViewMode === "facility") {
-    const roomHits = raycaster.intersectObject(datacenter.group, true);
-    if (roomHits.length > 0) {
-      switchViewMode("rack");
-      return;
-    }
-  } else if (currentViewMode === "rack") {
-    const roomHits = raycaster.intersectObject(datacenter.group, true);
-    if (roomHits.length > 0) {
-      switchViewMode("tray");
-      return;
+  // 3. O(1) Hero Rack Hit Proxy (Rack / Tray Zoom)
+  if (datacenter.heroRack.hitProxy) {
+    const rackHits = raycaster.intersectObject(datacenter.heroRack.hitProxy, false);
+    if (rackHits.length > 0) {
+      if (currentViewMode === "facility") {
+        switchViewMode("rack");
+      } else if (currentViewMode === "rack") {
+        switchViewMode("tray");
+      }
     }
   }
 });
