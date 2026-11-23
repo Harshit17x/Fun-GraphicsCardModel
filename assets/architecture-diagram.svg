@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 480" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18202c"/>
+      <stop offset="100%" stop-color="#0f141c"/>
+    </linearGradient>
+    <linearGradient id="activeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1f2c3d"/>
+      <stop offset="100%" stop-color="#121a24"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <rect width="1200" height="480" rx="16" fill="#090d14"/>
+  <rect x="2" y="2" width="1196" height="476" rx="15" fill="none" stroke="#1f2d3d" stroke-width="1.5"/>
+
+  <!-- Header -->
+  <text x="50" y="55" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#76b900" letter-spacing="3">SYSTEM ARCHITECTURE &amp; INTERACTIVE ZOOM HIERARCHY</text>
+  <text x="50" y="85" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="800" fill="#f8fafc">From Macro Datacenter Facility to Nanoscale Silicon Teardown</text>
+
+  <!-- Level 1 -->
+  <g transform="translate(50, 120)">
+    <rect width="250" height="310" rx="12" fill="url(#cardGrad)" stroke="#2a3a4d" stroke-width="1.5"/>
+    <rect x="0" y="0" width="250" height="6" rx="3" fill="#38bdf8"/>
+    <circle cx="35" cy="40" r="16" fill="#0369a1" fill-opacity="0.3"/>
+    <text x="35" y="46" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="900" fill="#38bdf8" text-anchor="middle">1</text>
+    <text x="65" y="38" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="700" fill="#94a3b8" letter-spacing="1">TIER 1 • MACRO</text>
+    <text x="65" y="55" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="800" fill="#ffffff">Facility Aisle</text>
+
+    <!-- Visual icon/illustration -->
+    <rect x="25" y="75" width="200" height="110" rx="8" fill="#0b1118" stroke="#1e293b"/>
+    <!-- Racks left -->
+    <rect x="35" y="85" width="40" height="90" rx="3" fill="#1e293b"/>
+    <line x1="40" y1="95" x2="70" y2="95" stroke="#38bdf8" stroke-width="1.5"/>
+    <line x1="40" y1="110" x2="70" y2="110" stroke="#76b900" stroke-width="1.5"/>
+    <line x1="40" y1="125" x2="70" y2="125" stroke="#38bdf8" stroke-width="1.5"/>
+    <line x1="40" y1="140" x2="70" y2="140" stroke="#f59e0b" stroke-width="1.5"/>
+    <!-- Floor walkway -->
+    <polygon points="85,175 165,175 140,85 110,85" fill="#141e2b" opacity="0.6"/>
+    <!-- Racks right -->
+    <rect x="175" y="85" width="40" height="90" rx="3" fill="#1e293b"/>
+    <line x1="180" y1="95" x2="210" y2="95" stroke="#38bdf8" stroke-width="1.5"/>
+    <line x1="180" y1="110" x2="210" y2="110" stroke="#38bdf8" stroke-width="1.5"/>
+    <line x1="180" y1="125" x2="210" y2="125" stroke="#76b900" stroke-width="1.5"/>
+    <line x1="180" y1="140" x2="210" y2="140" stroke="#38bdf8" stroke-width="1.5"/>
+
+    <text x="25" y="210" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600" fill="#cbd5e1">• Dual-row 42U DGX Racks</text>
+    <text x="25" y="232" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600" fill="#cbd5e1">• High-Gloss Reflective Floor</text>
+    <text x="25" y="254" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600" fill="#cbd5e1">• CDU, CRAC &amp; PDU Systems</text>
+    <text x="25" y="276" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600" fill="#cbd5e1">• Procedural 60Hz Audio Hum</text>
+    <rect x="25" y="285" width="200" height="1" fill="#1e293b"/>
+  </g>
+
+  <!-- Arrow 1 -> 2 -->
+  <path d="M 315,275 L 340,275" stroke="#38bdf8" stroke-width="3" stroke-dasharray="4,4"/>
+  <polygon points="345,275 335,269 335,281" fill="#38bdf8"/>
+
+  <!-- Level 2 -->
+  <g transform="translate(355, 120)">
+    <rect width="250" height="310" rx="12" fill="url(#cardGrad)" stroke="#2a3a4d" stroke-width="1.5"/>
+    <rect x="0" y="0" width="250" height="6" rx="3" fill="#818cf8"/>
+    <circle cx="35" cy="40" r="16" fill="#4338ca" fill-opacity="0.3"/>
+    <text x="35" y="46" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="900" fill="#818cf8" text-anchor="middle">2</text>
+    <text x="65" y="38" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="700" fill="#94a3b8" letter-spacing="1">TIER 2 • CABINET</text>
+    <text x="65" y="55" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="800" fill="#ffffff">Server Rack A04</text>
+
+    <!-- Visual icon -->
+    <rect x="25" y="75" width="200" height="110" rx="8" fill="#0b1118" stroke="#1e293b"/>
+    <rect x="80" y="85" width="90" height="90" rx="4" fill="#1e293b" stroke="#334155"/>
+    <!-- Door swing -->
+    <line x1="80" y1="85" x2="50" y2="105" stroke="#818cf8" stroke-width="3"/>
+    <text x="45" y="125" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" fill="#818cf8">95° Door</text>
+    <rect x="90" y="115" width="70" height="30" rx="2" fill="#334155" stroke="#76b900"/>
+
+    <text x="25" y="210" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600" fill="#cbd5e1">• Glass Door Pivot (0°–95°)</text>
+    <text x="25" y="232" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600" fill="#cbd5e1">• 42U Rack Plaque A04</text>
+    <text x="25" y="254" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600" fill="#cbd5e1">• Stacked 4U/2U Nodes</text>
+    <text x="25" y="276" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600" fill="#cbd5e1">• Telescoping Slide Rails</text>
+    <rect x="25" y="285" width="200" height="1" fill="#1e293b"/>
+  </g>
+
+  <!-- Arrow 2 -> 3 -->
+  <path d="M 620,275 L 645,275" stroke="#818cf8" stroke-width="3" stroke-dasharray="4,4"/>
+  <polygon points="650,275 640,269 640,281" fill="#818cf8"/>
+
+  <!-- Level 3 -->
+  <g transform="translate(660, 120)">
+    <rect width="250" height="310" rx="12" fill="url(#cardGrad)" stroke="#2a3a4d" stroke-width="1.5"/>
+    <rect x="0" y="0" width="250" height="6" rx="3" fill="#a855f7"/>
+    <circle cx="35" cy="40" r="16" fill="#7e22ce" fill-opacity="0.3"/>
+    <text x="35" y="46" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="900" fill="#a855f7" text-anchor="middle">3</text>
+    <text x="65" y="38" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="700" fill="#94a3b8" letter-spacing="1">TIER 3 • CHASSIS</text>
+    <text x="65" y="55" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="800" fill="#ffffff">4U Compute Blade</text>
+
+    <!-- Visual icon -->
+    <rect x="25" y="75" width="200" height="110" rx="8" fill="#0b1118" stroke="#1e293b"/>
+    <!-- Extended sled -->
+    <rect x="40" y="90" width="170" height="75" rx="3" fill="#1e293b" stroke="#64748b"/>
+    <!-- 8 GPU slots -->
+    <g fill="#76b900" opacity="0.8">
+      <rect x="48" y="100" width="16" height="55" rx="2"/>
+      <rect x="68" y="100" width="16" height="55" rx="2"/>
+      <rect x="88" y="100" width="16" height="55" rx="2"/>
+      <rect x="108" y="100" width="16" height="55" rx="2"/>
+      <rect x="128" y="100" width="16" height="55" rx="2"/>
+      <rect x="148" y="100" width="16" height="55" rx="2"/>
+      <rect x="168" y="100" width="16" height="55" rx="2"/>
+      <rect x="188" y="100" width="16" height="55" rx="2" fill="#38bdf8"/>
+    </g>
+
+    <text x="25" y="210" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600" fill="#cbd5e1">• 8× High-Density GPU Sled</text>
+    <text x="25" y="232" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600" fill="#cbd5e1">• HGX Baseboard &amp; Risers</text>
+    <text x="25" y="254" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600" fill="#cbd5e1">• 6× Hot-Swap Fan Modules</text>
+    <text x="25" y="276" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600" fill="#cbd5e1">• 4× Titanium PSU Array</text>
+    <rect x="25" y="285" width="200" height="1" fill="#1e293b"/>
+  </g>
+
+  <!-- Arrow 3 -> 4 -->
+  <path d="M 925,275 L 950,275" stroke="#a855f7" stroke-width="3" stroke-dasharray="4,4"/>
+  <polygon points="955,275 945,269 945,281" fill="#a855f7"/>
+
+  <!-- Level 4 -->
+  <g transform="translate(965, 120)">
+    <rect width="185" height="310" rx="12" fill="url(#activeGrad)" stroke="#76b900" stroke-width="2"/>
+    <rect x="0" y="0" width="185" height="6" rx="3" fill="#76b900"/>
+    <circle cx="30" cy="40" r="16" fill="#76b900" fill-opacity="0.3"/>
+    <text x="30" y="46" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="900" fill="#76b900" text-anchor="middle">4</text>
+    <text x="56" y="38" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" fill="#76b900" letter-spacing="1">TIER 4 • SILICON</text>
+    <text x="56" y="55" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="15" font-weight="800" fill="#ffffff">RTX 4090 Exploded</text>
+
+    <!-- Visual icon -->
+    <rect x="18" y="75" width="150" height="110" rx="8" fill="#0b1118" stroke="#1e293b"/>
+    <!-- Exploded layers -->
+    <rect x="35" y="83" width="115" height="12" rx="2" fill="#475569"/>
+    <rect x="35" y="99" width="115" height="14" rx="2" fill="#94a3b8"/>
+    <rect x="35" y="117" width="115" height="12" rx="2" fill="#0284c7"/>
+    <rect x="35" y="133" width="115" height="12" rx="2" fill="#15803d"/>
+    <circle cx="92" cy="139" r="4" fill="#22c55e"/>
+    <rect x="35" y="149" width="115" height="12" rx="2" fill="#334155"/>
+    <rect x="35" y="165" width="115" height="12" rx="2" fill="#1e293b"/>
+
+    <text x="18" y="210" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="600" fill="#cbd5e1">• 8 Engineering Layers</text>
+    <text x="18" y="232" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="600" fill="#cbd5e1">• 3D Stack / Linear Mode</text>
+    <text x="18" y="254" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="600" fill="#cbd5e1">• Interactive 3D Callouts</text>
+    <text x="18" y="276" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="600" fill="#cbd5e1">• AD102 Die &amp; GDDR6X</text>
+    <rect x="18" y="285" width="150" height="1" fill="#1e293b"/>
+  </g>
+</svg>

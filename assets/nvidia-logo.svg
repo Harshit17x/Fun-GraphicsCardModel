@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 280" width="100%" height="100%">
+  <defs>
+    <linearGradient id="nvGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8ce100"/>
+      <stop offset="100%" stop-color="#76b900"/>
+    </linearGradient>
+    <linearGradient id="darkBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#14181f"/>
+      <stop offset="100%" stop-color="#0a0d12"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="280" rx="20" fill="url(#darkBg)" stroke="#76b900" stroke-width="2" stroke-opacity="0.3"/>
+  <g transform="translate(60, 40)">
+    <!-- NVIDIA Eye / Swirl Symbol -->
+    <path d="M 125,12 C 70,12 25,54 20,105 C 16,145 42,180 80,195 C 75,183 72,170 72,156 C 72,118 100,85 137,80 C 172,75 204,97 214,130 C 220,118 223,105 223,92 C 223,48 179,12 125,12 Z" fill="url(#nvGreen)"/>
+    <path d="M 125,48 C 96,48 72,72 72,101 C 72,130 96,154 125,154 C 154,154 178,130 178,101 C 178,72 154,48 125,48 Z" fill="#0a0d12"/>
+    <path d="M 125,72 C 141,72 154,85 154,101 C 154,117 141,130 125,130 C 109,130 96,117 96,101 C 96,85 109,72 125,72 Z" fill="url(#nvGreen)"/>
+    <!-- Claw Arc Lines -->
+    <path d="M 235,92 C 235,145 190,190 130,190 C 95,190 65,172 48,145 C 56,165 74,180 96,188 C 112,194 130,195 148,190 C 185,180 215,150 226,112 C 232,105 235,98 235,92 Z" fill="#ffffff" opacity="0.85"/>
+  </g>
+  <!-- NVIDIA Wordmark Typography -->
+  <g fill="#ffffff" transform="translate(340, 75)">
+    <!-- N -->
+    <path d="M 0,125 L 0,0 L 32,0 L 80,78 L 80,0 L 110,0 L 110,125 L 78,125 L 30,46 L 30,125 Z"/>
+    <!-- V -->
+    <path d="M 130,0 L 165,0 L 198,88 L 230,0 L 265,0 L 215,125 L 180,125 Z"/>
+    <!-- I -->
+    <path d="M 285,0 L 315,0 L 315,125 L 285,125 Z"/>
+    <!-- D -->
+    <path d="M 340,0 L 395,0 C 435,0 460,28 460,62 C 460,97 435,125 395,125 L 340,125 Z M 370,25 L 370,100 L 395,100 C 418,100 430,85 430,62 C 430,40 418,25 395,25 Z"/>
+    <!-- I -->
+    <path d="M 485,0 L 515,0 L 515,125 L 485,125 Z"/>
+    <!-- A -->
+    <path d="M 570,0 L 610,0 L 655,125 L 622,125 L 610,90 L 568,90 L 556,125 L 525,125 Z M 576,66 L 602,66 L 589,28 Z"/>
+    <!-- GEFORCE RTX Subtitle -->
+    <text x="690" y="55" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="34" font-weight="800" fill="#76b900" letter-spacing="4">GEFORCE</text>
+    <text x="690" y="105" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="44" font-weight="900" fill="#ffffff" letter-spacing="6">RTX 4090</text>
+  </g>
+</svg>
