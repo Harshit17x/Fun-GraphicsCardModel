@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/controls/OrbitControls.js";
 import { RoundedBoxGeometry } from "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/geometries/RoundedBoxGeometry.js";
-import { createServerRoom } from "./serverRoom.js";
-import { createRtx4090Card } from "./rtx4090Card.js";
+import { createServerRoom } from "./serverRoom.js?v=23";
+import { createRtx4090Card } from "./rtx4090Card.js?v=23";
 
 // ============================================================================
 // DOM Elements
@@ -198,10 +198,11 @@ if (btnSoundToggle) {
 // Three.js Scene Setup (High-FPS Photorealistic Cleanroom & Studio IBL)
 // ============================================================================
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xedf1f6);
-scene.fog = new THREE.Fog(0xe2e8f0, 70, 230);
+scene.background = new THREE.Color(0x05080c);
+// Depth haze: the near aisle stays crisp, the support hall reads as lit architecture.
+scene.fog = new THREE.Fog(0x060a0f, 175, 520);
 
-const camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.1, 360);
+const camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.1, 560);
 
 const renderer = new THREE.WebGLRenderer({
   canvas,
@@ -209,10 +210,12 @@ const renderer = new THREE.WebGLRenderer({
   alpha: false,
   powerPreference: "high-performance",
 });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+const MAX_PIXEL_RATIO = Math.min(window.devicePixelRatio || 1, 1.5);
+let currentPixelRatio = MAX_PIXEL_RATIO;
+renderer.setPixelRatio(currentPixelRatio);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.15;
+renderer.toneMappingExposure = 0.92;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -220,10 +223,10 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 function createStudioEnvMap(r) {
   const pmrem = new THREE.PMREMGenerator(r);
   const envScene = new THREE.Scene();
-  envScene.background = new THREE.Color(0xe8eef5);
-  const panelMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-  const warmMat = new THREE.MeshBasicMaterial({ color: 0xf7f1e3 });
-  const coolMat = new THREE.MeshBasicMaterial({ color: 0xdbeafe });
+  envScene.background = new THREE.Color(0x141b24);
+  const panelMat = new THREE.MeshBasicMaterial({ color: 0xaebccd });
+  const warmMat = new THREE.MeshBasicMaterial({ color: 0xd8c8aa });
+  const coolMat = new THREE.MeshBasicMaterial({ color: 0x8fb6d8 });
   const topPanel = new THREE.Mesh(new THREE.PlaneGeometry(18, 18), panelMat);
   topPanel.position.set(0, 8, 0);
   topPanel.rotation.x = Math.PI / 2;
@@ -252,22 +255,36 @@ controls.autoRotate = false;
 controls.autoRotateSpeed = 0.7;
 
 // Streamlined 3-Light Studio Illumination Rig (locked 60 FPS)
-const hemiLight = new THREE.HemisphereLight(0xffffff, 0xcbd5e1, 1.15);
+const hemiLight = new THREE.HemisphereLight(0x9db7d8, 0x05070a, 0.34);
 hemiLight.position.set(0, 60, 0);
 scene.add(hemiLight);
 
-const aisleKeyLight = new THREE.DirectionalLight(0xffffff, 1.35);
+const aisleKeyLight = new THREE.DirectionalLight(0xfff6ea, 1.32);
 aisleKeyLight.position.set(14, 64, 34);
 aisleKeyLight.castShadow = true;
 aisleKeyLight.shadow.mapSize.set(1024, 1024);
 aisleKeyLight.shadow.bias = -0.0004;
 scene.add(aisleKeyLight);
 
-const fillLight = new THREE.DirectionalLight(0xeef6ff, 0.65);
+const fillLight = new THREE.DirectionalLight(0x8fb8e0, 0.24);
 fillLight.position.set(-18, 42, -26);
 scene.add(fillLight);
 
+// Soft warm bounce inside the cold aisle keeps the floor and faceplates alive
+// without flattening the contrast from the overhead key.
+const aisleBounce = new THREE.PointLight(0xffe9c7, 620, 150, 2);
+aisleBounce.position.set(0, 58, 26);
+scene.add(aisleBounce);
+
 const clock = new THREE.Clock();
+let fpsWindowTime = 0;
+let fpsWindowFrames = 0;
+let lastQualityDrop = 0;
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) clock.getDelta();
+});
+
 const pointer = new THREE.Vector2(0, 0);
 const raycaster = new THREE.Raycaster();
 let interactiveMeshes = [];
@@ -299,6 +316,19 @@ function transitionCamera(targetPos, targetTarget, targetFov = null, speed = 0.0
   cameraTransitionProgress = 0.0;
   cameraTransitionSpeed = speed;
   isCameraTransitioning = true;
+}
+
+function applyCameraPreset(preset, immediate = false, speed = 0.035) {
+  if (immediate) {
+    isCameraTransitioning = false;
+    camera.position.copy(preset.position);
+    controls.target.copy(preset.target);
+    camera.fov = preset.fov;
+    camera.updateProjectionMatrix();
+    controls.update();
+    return;
+  }
+  transitionCamera(preset.position, preset.target, preset.fov, speed);
 }
 
 // 3D Component Inspection / Focus State
@@ -731,7 +761,7 @@ function switchViewMode(mode, immediate = false) {
     clearPartFocus();
     hidePartInfo();
     const preset = datacenter.getCameraPreset("facility");
-    transitionCamera(preset.position, preset.target, preset.fov, 0.035);
+    applyCameraPreset(preset, immediate);
     controls.minDistance = preset.minDistance || 4;
     controls.maxDistance = preset.maxDistance || 220;
     updateActiveCamBtn("aisle");
@@ -741,7 +771,7 @@ function switchViewMode(mode, immediate = false) {
     datacenter.openHeroDoor(1.0);
     updateDoorBtn(true);
     const preset = datacenter.getCameraPreset("rack");
-    transitionCamera(preset.position, preset.target, preset.fov, 0.035);
+    applyCameraPreset(preset, immediate);
     controls.minDistance = preset.minDistance || 3;
     controls.maxDistance = preset.maxDistance || 120;
     updateActiveCamBtn("rack");
@@ -753,7 +783,7 @@ function switchViewMode(mode, immediate = false) {
     datacenter.extendHeroTray(1.0);
     updateTrayBtn(true);
     const preset = datacenter.getCameraPreset("blade");
-    transitionCamera(preset.position, preset.target, preset.fov, 0.035);
+    applyCameraPreset(preset, immediate);
     controls.minDistance = preset.minDistance || 2;
     controls.maxDistance = preset.maxDistance || 80;
     updateActiveCamBtn(null);
@@ -763,7 +793,7 @@ function switchViewMode(mode, immediate = false) {
     datacenter.extendHeroTray(1.0);
     updateTrayBtn(true);
     const preset = datacenter.getCameraPreset("gpu");
-    transitionCamera(preset.position, preset.target, preset.fov, 0.035);
+    applyCameraPreset(preset, immediate);
     controls.minDistance = preset.minDistance || 1.5;
     controls.maxDistance = preset.maxDistance || 60;
     updateActiveCamBtn(null);
@@ -820,6 +850,10 @@ if (btnCamFlythrough) {
 if (btnCamRack) {
   btnCamRack.addEventListener("click", () => {
     switchViewMode("rack");
+    // "Front" is the close portrait; the top-bar Rack 04 preset is the wide
+    // hero shot, so give the HUD button a distinct framing.
+    const p = datacenter.getCameraPreset("rackFront");
+    transitionCamera(p.position, p.target, p.fov);
     updateActiveCamBtn("rack");
   });
 }
@@ -1002,13 +1036,14 @@ function updateLeaderHighlight() {
 }
 
 const tempWorldVec = new THREE.Vector3();
+let calloutsWereActive = false;
 
 function updateCallouts() {
-  const width = window.innerWidth;
-  const height = window.innerHeight;
   const isExplodedEnough = currentViewMode === "gpu" && explosionProgress > 0.14;
 
   if (!isExplodedEnough) {
+    if (!calloutsWereActive) return;
+    calloutsWereActive = false;
     calloutMap.forEach((item) => {
       if (item.el) item.el.classList.remove("visible");
       const leader = leaderElements.get(item.key);
@@ -1016,6 +1051,10 @@ function updateCallouts() {
     });
     return;
   }
+
+  calloutsWereActive = true;
+  const width = window.innerWidth;
+  const height = window.innerHeight;
 
   const activeItems = [];
   calloutMap.forEach((item) => {
@@ -1204,6 +1243,8 @@ function animateParts() {
 
 function animate() {
   requestAnimationFrame(animate);
+  if (document.hidden) return;
+
   const delta = clock.getDelta();
   const elapsed = clock.getElapsedTime();
 
@@ -1267,6 +1308,22 @@ function animate() {
   }
   if (card.userData.part8 && card.userData.part8.userData.rearFan) {
     card.userData.part8.userData.rearFan.userData.bladeGroup.rotation.y -= 0.024;
+  }
+
+  // 6. Adaptive resolution — protect frame rate on high-DPI / integrated GPUs
+  fpsWindowTime += delta;
+  fpsWindowFrames += 1;
+  if (fpsWindowTime >= 1.5) {
+    const fps = fpsWindowFrames / fpsWindowTime;
+    fpsWindowTime = 0;
+    fpsWindowFrames = 0;
+    const now = performance.now();
+    if (fps < 44 && currentPixelRatio > 1.0 && now - lastQualityDrop > 4000) {
+      currentPixelRatio = Math.max(1.0, currentPixelRatio - 0.25);
+      renderer.setPixelRatio(currentPixelRatio);
+      resizeRenderer();
+      lastQualityDrop = now;
+    }
   }
 
   renderer.render(scene, camera);
@@ -1487,6 +1544,10 @@ if (initialView === "exploded" || initialView === "gpu") {
   setExplosionTarget(1.0);
 } else if (initialView === "rack") {
   switchViewMode("rack", true);
+} else if (initialView === "front") {
+  switchViewMode("rack", true);
+  applyCameraPreset(datacenter.getCameraPreset("rackFront"), true);
+  setExplosionTarget(0.0);
 } else if (initialView === "tray" || initialView === "blade") {
   switchViewMode("tray", true);
 } else {
@@ -1501,10 +1562,21 @@ if (initialView === "exploded" || initialView === "gpu") {
   setExplosionTarget(0.0);
 }
 
-// Dismiss loading overlay
-if (sceneLoader) {
-  sceneLoader.classList.add("hidden");
-}
+// Dismiss the loading overlay once Blender-authored support assets settle
+// (or after a short safety timeout so a failed asset never blocks the UI).
+const assetsSettled = datacenter.assetsReady || Promise.resolve();
+Promise.race([
+  assetsSettled,
+  new Promise((resolve) => window.setTimeout(resolve, 1800)),
+]).finally(() => {
+  if (sceneLoader) sceneLoader.classList.add("hidden");
+});
 
 // Start master render loop
 animate();
+
+// Development hook: allows camera/lighting inspection without shipping
+// debug UI. Only active when the page is loaded with ?debug=1.
+if (new URLSearchParams(window.location.search).has("debug")) {
+  window.__viewer = { scene, camera, controls, renderer, datacenter, THREE };
+}
