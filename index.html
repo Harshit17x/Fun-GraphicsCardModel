@@ -11,13 +11,13 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=23" />
+    <link rel="stylesheet" href="./styles.css?v=24" />
   </head>
   <body>
     <main
       id="scene-container"
-      class="view-facility"
-      aria-label="NVIDIA DGX SuperPOD Datacenter and RTX 4090 3D Interactive Visualization"
+      class="view-lab"
+      aria-label="NVIDIA DGX SuperPOD Datacenter, Computer Lab, and RTX 4090 3D Interactive Visualization"
     >
       <!-- Minimal Studio Loader -->
       <div class="scene-loader" id="sceneLoader">
@@ -37,16 +37,25 @@
 
         <!-- Clean Floating View Switcher (Center) -->
         <nav class="view-segmented-pill" id="viewModeBar" aria-label="View Modes">
-          <button id="btnViewFacility" class="seg-btn active" data-view="facility" title="Facility Aisle (1)">
+          <button id="btnViewLab" class="seg-btn active" data-view="lab" title="Computer Lab & Observation Deck (1)">
+            Lab
+          </button>
+          <button id="btnViewKeyboard" class="seg-btn" data-view="keyboard" title="3D Mechanical Gaming Keyboard (2)">
+            Keyboard
+          </button>
+          <button id="btnViewPlayer" class="seg-btn" data-view="player" title="Player Walk & Explore (3)">
+            Player
+          </button>
+          <button id="btnViewFacility" class="seg-btn" data-view="facility" title="Server Aisle 04 (4)">
             Aisle
           </button>
-          <button id="btnViewRack" class="seg-btn" data-view="rack" title="Server Rack 04 (2)">
+          <button id="btnViewRack" class="seg-btn" data-view="rack" title="Server Rack 04 (5)">
             Rack 04
           </button>
-          <button id="btnViewTray" class="seg-btn" data-view="tray" title="GPU Blade Sled (3)">
+          <button id="btnViewTray" class="seg-btn" data-view="tray" title="GPU Blade Sled (6)">
             Blade
           </button>
-          <button id="btnViewGpu" class="seg-btn" data-view="gpu" title="RTX 4090 3D Explode (4)">
+          <button id="btnViewGpu" class="seg-btn" data-view="gpu" title="RTX 4090 3D Explode (7)">
             RTX 4090
           </button>
         </nav>
@@ -184,6 +193,26 @@
 
       <!-- Minimal Contextual Bottom Dock -->
       <div class="bottom-dock" id="bottomDock">
+        <!-- 0. Lab & Keyboard & Player Contextual Pills -->
+        <div class="facility-hint-pill" id="labHint">
+          Click Keyboard, PC Tower, Player, or Server Aisle · Press 1–7 to switch views
+        </div>
+
+        <div class="facility-hint-pill" id="keyboardHint">
+          Press WASD, Space, E, R, or 1–8 to test live 3D mechanical keycaps · Drag to orbit
+        </div>
+
+        <div class="rack-control-bar" id="playerControlBar">
+          <span class="player-walk-hint">Walk: W A S D / Arrows</span>
+          <span class="pill-divider" aria-hidden="true"></span>
+          <button id="btnWalkToAisle" class="dock-btn" title="Move Player to Server Aisle">
+            Enter Aisle
+          </button>
+          <button id="btnResetPlayer" class="dock-btn" title="Return Player to Lab Desk">
+            Reset to Lab
+          </button>
+        </div>
+
         <!-- 1. Facility Hint -->
         <div class="facility-hint-pill" id="facilityHint">
           Click Rack 04 to inspect · Drag to orbit · Scroll to zoom
@@ -272,6 +301,6 @@
         }
       }
     </script>
-    <script type="module" src="./main.js?v=23"></script>
+    <script type="module" src="./main.js?v=24"></script>
   </body>
 </html>

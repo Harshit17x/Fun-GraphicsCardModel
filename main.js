@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/controls/OrbitControls.js";
 import { RoundedBoxGeometry } from "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/geometries/RoundedBoxGeometry.js";
-import { createServerRoom } from "./serverRoom.js?v=23";
-import { createRtx4090Card } from "./rtx4090Card.js?v=23";
+import { createServerRoom } from "./serverRoom.js?v=24";
+import { createRtx4090Card } from "./rtx4090Card.js?v=24";
 
 // ============================================================================
 // DOM Elements
@@ -12,16 +12,26 @@ const sceneContainer = document.querySelector("#scene-container");
 const sceneLoader = document.querySelector("#sceneLoader");
 
 // View Mode Navigation (Clean Segmented Pill)
+const btnViewLab = document.querySelector("#btnViewLab");
+const btnViewKeyboard = document.querySelector("#btnViewKeyboard");
+const btnViewPlayer = document.querySelector("#btnViewPlayer");
 const btnViewFacility = document.querySelector("#btnViewFacility");
 const btnViewRack = document.querySelector("#btnViewRack");
 const btnViewTray = document.querySelector("#btnViewTray");
 const btnViewGpu = document.querySelector("#btnViewGpu");
 const viewButtons = {
+  lab: btnViewLab,
+  keyboard: btnViewKeyboard,
+  player: btnViewPlayer,
   facility: btnViewFacility,
   rack: btnViewRack,
   tray: btnViewTray,
   gpu: btnViewGpu,
 };
+
+// Player Walk Actions
+const btnWalkToAisle = document.querySelector("#btnWalkToAisle");
+const btnResetPlayer = document.querySelector("#btnResetPlayer");
 
 // Facility Action Buttons (Contextual in Rack & Blade Views)
 const btnToggleDoor = document.querySelector("#btnToggleDoor");
@@ -199,8 +209,8 @@ if (btnSoundToggle) {
 // ============================================================================
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x05080c);
-// Depth haze: the near aisle stays crisp, the support hall reads as lit architecture.
-scene.fog = new THREE.Fog(0x060a0f, 175, 520);
+// Depth haze: the near aisle & glass lab stay crisp while distant support hall reads as lit architecture.
+scene.fog = new THREE.Fog(0x060a0f, 225, 580);
 
 const camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.1, 560);
 
@@ -295,7 +305,8 @@ let heroSpotlight = null;
 // ============================================================================
 // Camera Transition & Multi-Scale View Modes
 // ============================================================================
-let currentViewMode = "facility"; // 'facility', 'rack', 'tray', 'gpu'
+let currentViewMode = "lab"; // 'lab', 'keyboard', 'player', 'facility', 'rack', 'tray', 'gpu'
+const pressedMoveKeys = new Set();
 let isCameraTransitioning = false;
 const cameraStartPos = new THREE.Vector3();
 const cameraEndPos = new THREE.Vector3();
@@ -745,11 +756,19 @@ function updateActiveCamBtn(camKey) {
 }
 
 function switchViewMode(mode, immediate = false) {
-  if (!["facility", "rack", "tray", "gpu"].includes(mode)) return;
+  if (!["lab", "keyboard", "player", "facility", "rack", "tray", "gpu"].includes(mode)) return;
   currentViewMode = mode;
 
   // Toggle container classes for contextual HUD sliding
-  sceneContainer.classList.remove("view-facility", "view-rack", "view-tray", "view-gpu");
+  sceneContainer.classList.remove(
+    "view-lab",
+    "view-keyboard",
+    "view-player",
+    "view-facility",
+    "view-rack",
+    "view-tray",
+    "view-gpu"
+  );
   sceneContainer.classList.add(`view-${mode}`);
 
   // Update navigation button active state
@@ -757,7 +776,42 @@ function switchViewMode(mode, immediate = false) {
     if (btn) btn.classList.toggle("active", key === mode);
   });
 
-  if (mode === "facility") {
+  if (mode === "lab") {
+    clearPartFocus();
+    hidePartInfo();
+    const preset = datacenter.getCameraPreset("lab");
+    applyCameraPreset(preset, immediate);
+    controls.minDistance = preset.minDistance || 6;
+    controls.maxDistance = preset.maxDistance || 180;
+    updateActiveCamBtn(null);
+  } else if (mode === "keyboard") {
+    clearPartFocus();
+    hidePartInfo();
+    const preset = datacenter.getCameraPreset("keyboard");
+    applyCameraPreset(preset, immediate, 0.045);
+    controls.minDistance = preset.minDistance || 3.5;
+    controls.maxDistance = preset.maxDistance || 60;
+    updateActiveCamBtn(null);
+  } else if (mode === "player") {
+    clearPartFocus();
+    hidePartInfo();
+    const pt = datacenter.getPlayerTransform();
+    const pPos = pt.position;
+    const behindOffset = new THREE.Vector3(0, 52.0, 62.0).applyAxisAngle(
+      new THREE.Vector3(0, 1, 0),
+      pt.rotationY - Math.PI
+    );
+    const camPos = pPos.clone().add(behindOffset);
+    const targetPos = pPos.clone().add(new THREE.Vector3(0, 32.0, 0));
+    applyCameraPreset(
+      { position: camPos, target: targetPos, fov: 48, minDistance: 20, maxDistance: 120 },
+      immediate,
+      0.045
+    );
+    controls.minDistance = 20;
+    controls.maxDistance = 120;
+    updateActiveCamBtn(null);
+  } else if (mode === "facility") {
     clearPartFocus();
     hidePartInfo();
     const preset = datacenter.getCameraPreset("facility");
@@ -801,10 +855,33 @@ function switchViewMode(mode, immediate = false) {
 }
 
 // Bind View Mode Nav Buttons
+if (btnViewLab) btnViewLab.addEventListener("click", () => switchViewMode("lab"));
+if (btnViewKeyboard) btnViewKeyboard.addEventListener("click", () => switchViewMode("keyboard"));
+if (btnViewPlayer) btnViewPlayer.addEventListener("click", () => switchViewMode("player"));
 if (btnViewFacility) btnViewFacility.addEventListener("click", () => switchViewMode("facility"));
 if (btnViewRack) btnViewRack.addEventListener("click", () => switchViewMode("rack"));
 if (btnViewTray) btnViewTray.addEventListener("click", () => switchViewMode("tray"));
 if (btnViewGpu) btnViewGpu.addEventListener("click", () => switchViewMode("gpu"));
+
+if (btnResetPlayer) {
+  btnResetPlayer.addEventListener("click", () => {
+    datacenter.resetPlayerPosition();
+    switchViewMode("player");
+  });
+}
+
+if (btnWalkToAisle) {
+  btnWalkToAisle.addEventListener("click", () => {
+    const pt = datacenter.getPlayerTransform();
+    pt.position.set(0.0, 0.0, 76.0);
+    if (datacenter.labTargets?.playerRig?.root) {
+      datacenter.labTargets.playerRig.root.position.copy(pt.position);
+      datacenter.labTargets.playerRig.rotY = Math.PI;
+      datacenter.labTargets.playerRig.root.rotation.y = Math.PI;
+    }
+    switchViewMode("player");
+  });
+}
 
 // Door & Tray Toggle Buttons
 if (btnToggleDoor) {
@@ -1248,9 +1325,33 @@ function animate() {
   const delta = clock.getDelta();
   const elapsed = clock.getElapsedTime();
 
-  // 1. Update Datacenter Server Room procedural animations (fans, LEDs, doors, tray)
+  // 1. Update Datacenter Server Room procedural animations (fans, LEDs, doors, tray, pedestals, keyboard, player)
   if (datacenter && datacenter.update) {
     datacenter.update(delta, elapsed);
+  }
+
+  // 1b. Third-Person Player Walk Movement & Smooth Camera Follow
+  if (currentViewMode === "player" && datacenter.setPlayerMovement) {
+    let fwd = 0;
+    let right = 0;
+    if (pressedMoveKeys.has("KeyW") || pressedMoveKeys.has("ArrowUp")) fwd += 1;
+    if (pressedMoveKeys.has("KeyS") || pressedMoveKeys.has("ArrowDown")) fwd -= 1;
+    if (pressedMoveKeys.has("KeyD") || pressedMoveKeys.has("ArrowRight")) right += 1;
+    if (pressedMoveKeys.has("KeyA") || pressedMoveKeys.has("ArrowLeft")) right -= 1;
+
+    const pt = datacenter.getPlayerTransform();
+    const prevX = pt.position.x;
+    const prevZ = pt.position.z;
+    const yaw = Math.atan2(camera.position.x - controls.target.x, camera.position.z - controls.target.z);
+    const moved = datacenter.setPlayerMovement(fwd, right, yaw, delta);
+    if (moved) {
+      const dx = pt.position.x - prevX;
+      const dz = pt.position.z - prevZ;
+      camera.position.x += dx;
+      camera.position.z += dz;
+      controls.target.x += dx;
+      controls.target.z += dz;
+    }
   }
 
   // 2. Smooth camera glide during view transitions
@@ -1355,7 +1456,16 @@ function updateHoverState() {
     updateLeaderHighlight();
   }
 
-  if ((currentViewMode === "facility" || currentViewMode === "rack") && datacenter.heroRack.hitProxy) {
+  if (currentViewMode === "lab" && datacenter.labTargets) {
+    const labProxies = [
+      datacenter.labTargets.keyboardHitProxy,
+      datacenter.labTargets.playerRig?.hitProxy,
+      datacenter.labTargets.workstationHitProxy,
+      datacenter.heroRack.hitProxy,
+    ].filter(Boolean);
+    const hits = raycaster.intersectObjects(labProxies, false);
+    canvas.style.cursor = hits.length > 0 ? "pointer" : "grab";
+  } else if ((currentViewMode === "facility" || currentViewMode === "rack") && datacenter.heroRack.hitProxy) {
     const hits = raycaster.intersectObject(datacenter.heroRack.hitProxy, false);
     canvas.style.cursor = hits.length > 0 ? "pointer" : "grab";
   } else {
@@ -1420,11 +1530,37 @@ canvas.addEventListener("click", () => {
     return;
   }
 
+  // 2b. Computer Lab Interactive Clicks (Keyboard -> Player -> Workstation PC)
+  if (currentViewMode === "lab" && datacenter.labTargets) {
+    if (datacenter.labTargets.keyboardHitProxy) {
+      const kbHits = raycaster.intersectObject(datacenter.labTargets.keyboardHitProxy, false);
+      if (kbHits.length > 0) {
+        switchViewMode("keyboard");
+        return;
+      }
+    }
+    if (datacenter.labTargets.playerRig?.hitProxy) {
+      const plHits = raycaster.intersectObject(datacenter.labTargets.playerRig.hitProxy, false);
+      if (plHits.length > 0) {
+        switchViewMode("player");
+        return;
+      }
+    }
+    if (datacenter.labTargets.workstationHitProxy) {
+      const wsHits = raycaster.intersectObject(datacenter.labTargets.workstationHitProxy, false);
+      if (wsHits.length > 0) {
+        const compPreset = datacenter.getCameraPreset("computer");
+        transitionCamera(compPreset.position, compPreset.target, compPreset.fov, 0.045);
+        return;
+      }
+    }
+  }
+
   // 3. O(1) Hero Rack Hit Proxy (Rack / Tray Zoom)
   if (datacenter.heroRack.hitProxy) {
     const rackHits = raycaster.intersectObject(datacenter.heroRack.hitProxy, false);
     if (rackHits.length > 0) {
-      if (currentViewMode === "facility") {
+      if (currentViewMode === "facility" || currentViewMode === "lab") {
         switchViewMode("rack");
       } else if (currentViewMode === "rack") {
         switchViewMode("tray");
@@ -1433,9 +1569,25 @@ canvas.addEventListener("click", () => {
   }
 });
 
-// Keyboard Shortcuts
+// Keyboard Shortcuts & Live 3D Mechanical Keyboard Reactivity
+window.addEventListener("keyup", (e) => {
+  pressedMoveKeys.delete(e.code);
+  if (datacenter && datacenter.triggerKeyPress) {
+    datacenter.triggerKeyPress(e.code, false);
+  }
+});
+
+window.addEventListener("blur", () => {
+  pressedMoveKeys.clear();
+});
+
 window.addEventListener("keydown", (e) => {
   if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
+
+  pressedMoveKeys.add(e.code);
+  if (datacenter && datacenter.triggerKeyPress) {
+    datacenter.triggerKeyPress(e.code, true);
+  }
 
   if (e.key === "Escape") {
     clearPartFocus();
@@ -1443,21 +1595,38 @@ window.addEventListener("keydown", (e) => {
     return;
   }
 
-  // View Mode Switcher: Keys 1 to 4
+  // View Mode Switcher: Keys 1 to 7
   if (e.key === "1") {
-    switchViewMode("facility");
+    switchViewMode("lab");
     return;
   }
   if (e.key === "2") {
-    switchViewMode("rack");
+    switchViewMode("keyboard");
     return;
   }
   if (e.key === "3") {
-    switchViewMode("tray");
+    switchViewMode("player");
     return;
   }
   if (e.key === "4") {
+    switchViewMode("facility");
+    return;
+  }
+  if (e.key === "5") {
+    switchViewMode("rack");
+    return;
+  }
+  if (e.key === "6") {
+    switchViewMode("tray");
+    return;
+  }
+  if (e.key === "7") {
     switchViewMode("gpu");
+    return;
+  }
+
+  // In Player Walk mode, WASD/Arrows steer the avatar without triggering Door/Reset shortcuts
+  if (currentViewMode === "player" && ["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) {
     return;
   }
 
@@ -1521,12 +1690,6 @@ window.addEventListener("keydown", (e) => {
     if (btnSoundToggle) btnSoundToggle.click();
     return;
   }
-
-  // Component Direct Focus: Keys 5 to 8
-  if (e.key >= "5" && e.key <= "8") {
-    const keys = ["frontShroud", "frontFan", "fanFrame", "heatsink", "pcb", "thermalPlate", "backplate", "rearShroud"];
-    focusOnPart(keys[parseInt(e.key, 10) - 1]);
-  }
 });
 
 window.addEventListener("resize", resizeRenderer);
@@ -1550,10 +1713,19 @@ if (initialView === "exploded" || initialView === "gpu") {
   setExplosionTarget(0.0);
 } else if (initialView === "tray" || initialView === "blade") {
   switchViewMode("tray", true);
-} else {
-  // Default: Facility Aisle perspective matching photorealistic cleanroom
+} else if (initialView === "facility" || initialView === "aisle") {
   switchViewMode("facility", true);
-  const initPreset = datacenter.getCameraPreset("facility");
+} else if (initialView === "keyboard") {
+  switchViewMode("keyboard", true);
+} else if (initialView === "player") {
+  switchViewMode("player", true);
+} else if (initialView === "computer" || initialView === "pc") {
+  switchViewMode("lab", true);
+  applyCameraPreset(datacenter.getCameraPreset("computer"), true);
+} else {
+  // Default: Computer Lab Observation Deck looking over Keyboard, PC, Player & into Aisle 04
+  switchViewMode("lab", true);
+  const initPreset = datacenter.getCameraPreset("lab");
   camera.position.copy(initPreset.position);
   controls.target.copy(initPreset.target);
   camera.fov = initPreset.fov;

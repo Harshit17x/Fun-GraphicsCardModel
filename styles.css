@@ -198,12 +198,21 @@ body {
   background: transparent;
   color: var(--ink-secondary);
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 500;
-  padding: 6px 14px;
+  padding: 6px 11px;
   border-radius: var(--radius-pill);
   cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.player-walk-hint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  padding: 0 6px;
   white-space: nowrap;
 }
 
@@ -668,6 +677,42 @@ body {
 }
 
 /* ---------------- Contextual Visibility Per View Mode ---------------- */
+#labHint,
+#keyboardHint,
+#playerControlBar {
+  display: none !important;
+}
+
+#scene-container.view-lab #labHint {
+  display: inline-flex !important;
+}
+#scene-container.view-lab #facilityHint,
+#scene-container.view-lab #facilityControlBar,
+#scene-container.view-lab #gpuExplodePanel,
+#scene-container.view-lab #callout-overlay {
+  display: none !important;
+}
+
+#scene-container.view-keyboard #keyboardHint {
+  display: inline-flex !important;
+}
+#scene-container.view-keyboard #facilityHint,
+#scene-container.view-keyboard #facilityControlBar,
+#scene-container.view-keyboard #gpuExplodePanel,
+#scene-container.view-keyboard #callout-overlay {
+  display: none !important;
+}
+
+#scene-container.view-player #playerControlBar {
+  display: inline-flex !important;
+}
+#scene-container.view-player #facilityHint,
+#scene-container.view-player #facilityControlBar,
+#scene-container.view-player #gpuExplodePanel,
+#scene-container.view-player #callout-overlay {
+  display: none !important;
+}
+
 #scene-container.view-facility #facilityHint {
   display: inline-flex !important;
 }
@@ -940,10 +985,21 @@ body {
 }
 
 /* ---------------- Responsive ---------------- */
-@media (max-width: 780px) {
+@media (max-width: 960px) {
   .brand-badge {
     display: none;
   }
+  .view-segmented-pill {
+    max-width: calc(100vw - 110px);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .view-segmented-pill::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (max-width: 780px) {
   .top-bar {
     top: 12px;
     left: 12px;

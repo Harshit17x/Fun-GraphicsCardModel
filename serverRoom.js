@@ -687,6 +687,67 @@ function createAisleSignTexture(T, label) {
   return texture;
 }
 
+/**
+ * Brushed Titanium "RTX AI SUPERPOD" End-Cap Pylon Faceplate Texture
+ */
+function createPodPylonTexture(T) {
+  if (typeof document === "undefined") return null;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 512;
+  canvas.height = 1024;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+
+  const grad = ctx.createLinearGradient(0, 0, 512, 1024);
+  grad.addColorStop(0, "#aeb8c4");
+  grad.addColorStop(0.4, "#c8d0da");
+  grad.addColorStop(0.8, "#939eab");
+  grad.addColorStop(1, "#7b8694");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 512, 1024);
+
+  // Subtle horizontal brushed grain
+  ctx.fillStyle = "rgba(255,255,255,0.06)";
+  for (let y = 0; y < 1024; y += 4) {
+    ctx.fillRect(0, y, 512, 1);
+  }
+
+  // Framing bevel & emerald stripe
+  ctx.strokeStyle = "#2b3542";
+  ctx.lineWidth = 10;
+  ctx.strokeRect(12, 12, 488, 1000);
+  ctx.fillStyle = "#76b900";
+  ctx.fillRect(28, 36, 456, 10);
+
+  // Bold NVIDIA RTX SuperPOD typography
+  ctx.fillStyle = "#0e131a";
+  ctx.textAlign = "center";
+  ctx.font = "800 92px -apple-system, BlinkMacSystemFont, 'Inter', sans-serif";
+  ctx.fillText("RTX", 256, 230);
+
+  ctx.fillStyle = "#1e293b";
+  ctx.font = "700 34px -apple-system, BlinkMacSystemFont, 'Inter', sans-serif";
+  ctx.fillText("AI SUPERPOD", 256, 286);
+
+  ctx.fillStyle = "#4b5563";
+  ctx.font = "600 20px monospace";
+  ctx.fillText("AD102 // DGX POD-A", 256, 336);
+
+  // Vertical recessed telemetry slit
+  ctx.fillStyle = "#10161e";
+  ctx.fillRect(216, 420, 80, 440);
+  for (let y = 448; y < 835; y += 26) {
+    ctx.fillStyle = y < 600 ? "#76b900" : "#38bdf8";
+    ctx.fillRect(234, y, 44, 8);
+  }
+
+  const tex = new T.CanvasTexture(canvas);
+  tex.colorSpace = T.SRGBColorSpace;
+  tex.anisotropy = 4;
+  return tex;
+}
+
 // ---------------------------------------------------------------------------
 // Shared Architectural PBR Materials
 // ---------------------------------------------------------------------------
@@ -1970,7 +2031,238 @@ export function createServerRoom(scene, options = {}) {
     cdu: new URL("./assets/cdu.glb", import.meta.url).href,
     pdu: new URL("./assets/pdu.glb", import.meta.url).href,
     crac: new URL("./assets/crac.glb", import.meta.url).href,
+    workstation: new URL("./assets/lab_workstation.glb", import.meta.url).href,
+    keyboard: new URL("./assets/gaming_keyboard.glb", import.meta.url).href,
+    player: new URL("./assets/player_model.glb", import.meta.url).href,
+    pedestal: new URL("./assets/gpu_core_pedestal.glb", import.meta.url).href,
   };
+
+  // -------------------------------------------------------------------------
+  // 7b. Creative Computer & Gaming Lab Observation Wing (Z = +126 to +210)
+  // -------------------------------------------------------------------------
+  const labGroup = new T.Group();
+  labGroup.name = "ComputerLabWing";
+  roomGroup.add(labGroup);
+
+  // Dark anti-static Lab Observation Deck floor covering Z = +126..+208
+  const labDeck = new T.Mesh(
+    new T.PlaneGeometry(roomWidth - 4, 82),
+    new T.MeshStandardMaterial({
+      color: 0x161c24,
+      roughness: 0.28,
+      metalness: 0.25,
+      envMapIntensity: 0.65,
+    })
+  );
+  labDeck.rotation.x = -Math.PI / 2;
+  labDeck.position.set(0, 0.06, 167);
+  labDeck.receiveShadow = true;
+  labGroup.add(labDeck);
+
+  // Glowing NVIDIA-green & cyan walkway runway strips leading from Desk to Aisle 04
+  [-16.5, 16.5].forEach((rx) => {
+    const runwayLine = new T.Mesh(
+      new T.BoxGeometry(0.32, 0.06, 40),
+      materials.accentStrip
+    );
+    runwayLine.position.set(rx, 0.075, 146);
+    labGroup.add(runwayLine);
+  });
+
+  // Lab perimeter floor light trim
+  [-66, 66].forEach((sideX) => {
+    const edge = new T.Mesh(
+      new T.BoxGeometry(0.35, 0.06, 78),
+      materials.markingStrip
+    );
+    edge.position.set(sideX, 0.075, 167);
+    labGroup.add(edge);
+  });
+
+  // Panoramic Glass Partition Wall at Z = +126 separating Lab from Aisle 04
+  const frontPortal = new T.Group();
+  frontPortal.position.set(0, 0, 126);
+  labGroup.add(frontPortal);
+
+  // Overhead Portal Beam & Green Edge Light
+  const frontHeader = new T.Mesh(
+    new T.BoxGeometry(roomWidth - 4, 3.2, 1.8),
+    materials.aluminumFrame
+  );
+  frontHeader.position.set(0, rackHeight - 0.8, 0);
+  frontPortal.add(frontHeader);
+
+  const frontHeaderGlow = new T.Mesh(
+    new T.BoxGeometry(roomWidth - 6, 0.35, 0.24),
+    materials.accentStrip
+  );
+  frontHeaderGlow.position.set(0, rackHeight - 2.4, 0.95);
+  frontPortal.add(frontHeaderGlow);
+
+  // Left & Right Brushed Titanium "RTX AI SUPERPOD" Pylons framing the open aisle portal
+  const pylonTex = createPodPylonTexture(T);
+  const pylonFaceMat = pylonTex
+    ? new T.MeshStandardMaterial({ map: pylonTex, roughness: 0.32, metalness: 0.65 })
+    : materials.chassisFace;
+
+  [-31, 31].forEach((px) => {
+    const pylon = new T.Mesh(
+      new T.BoxGeometry(24.0, rackHeight - 2.4, 2.2),
+      materials.rackFrame
+    );
+    pylon.position.set(px, (rackHeight - 2.4) * 0.5, 0);
+    frontPortal.add(pylon);
+
+    const pylonFace = new T.Mesh(
+      new T.PlaneGeometry(23.2, rackHeight - 3.4),
+      pylonFaceMat
+    );
+    pylonFace.position.set(px, (rackHeight - 2.4) * 0.5, 1.15);
+    frontPortal.add(pylonFace);
+  });
+
+  // Side Panoramic Glass Windows (X = -68..-43 and +43..+68)
+  [-56, 56].forEach((wx) => {
+    const winGlass = new T.Mesh(
+      new T.BoxGeometry(25.0, rackHeight - 4.0, 0.32),
+      materials.containmentGlass
+    );
+    winGlass.position.set(wx, (rackHeight - 4.0) * 0.5, 0);
+    frontPortal.add(winGlass);
+
+    const mullion = new T.Mesh(
+      new T.BoxGeometry(0.8, rackHeight - 2.4, 1.2),
+      materials.rackFrame
+    );
+    mullion.position.set(wx + (wx < 0 ? -12.6 : 12.6), (rackHeight - 2.4) * 0.5, 0);
+    frontPortal.add(mullion);
+  });
+
+  // Open Sliding Glass Door Leaves tucked to the sides (leaving X = -18..+18 wide open!)
+  [-21.5, 21.5].forEach((dx) => {
+    const openDoor = new T.Mesh(
+      new T.BoxGeometry(10.0, rackHeight - 4.0, 0.25),
+      materials.containmentGlass
+    );
+    openDoor.position.set(dx, (rackHeight - 4.0) * 0.5, 1.6);
+    frontPortal.add(openDoor);
+
+    const edgeStile = new T.Mesh(
+      new T.BoxGeometry(0.65, rackHeight - 4.0, 0.5),
+      materials.aluminumFrame
+    );
+    edgeStile.position.set(dx + (dx < 0 ? 5.0 : -5.0), (rackHeight - 4.0) * 0.5, 1.6);
+    frontPortal.add(edgeStile);
+  });
+
+  // Lab Portal Header Sign facing Lab (+Z)
+  const labPortalSignTex = createAisleSignTexture(T, "AISLE 04");
+  if (labPortalSignTex) {
+    const labPortalSign = new T.Mesh(
+      new T.PlaneGeometry(14.5, 3.6),
+      new T.MeshBasicMaterial({ map: labPortalSignTex, fog: false })
+    );
+    labPortalSign.position.set(0, rackHeight - 0.6, 1.15);
+    frontPortal.add(labPortalSign);
+  }
+
+  // Suspended Architectural Studio Halo Ring above the Command Desk
+  const haloRing = new T.Mesh(
+    new T.TorusGeometry(28.0, 0.75, 12, 48),
+    materials.trofferLight
+  );
+  haloRing.rotation.x = Math.PI / 2;
+  haloRing.position.set(0, 79.0, 166.0);
+  labGroup.add(haloRing);
+
+  const haloTrim = new T.Mesh(
+    new T.TorusGeometry(29.2, 0.25, 8, 48),
+    materials.accentStrip
+  );
+  haloTrim.rotation.x = Math.PI / 2;
+  haloTrim.position.set(0, 78.6, 166.0);
+  labGroup.add(haloTrim);
+
+  // Side Wall Illuminated Concept & Circuit Artwork Lightboxes (from image-generator!)
+  const artLoader = new T.TextureLoader();
+  [
+    { url: "./assets/lab_concept_vision.jpg", x: -roomWidth * 0.5 + 1.0, rotY: Math.PI / 2, z: 166 },
+    { url: "./assets/lab_deskmat_art.jpg", x: roomWidth * 0.5 - 1.0, rotY: -Math.PI / 2, z: 166 },
+  ].forEach((mural) => {
+    const frame = new T.Mesh(
+      new T.BoxGeometry(44.0, 24.5, 1.0),
+      materials.statusFrame
+    );
+    frame.rotation.y = mural.rotY;
+    frame.position.set(mural.x, 42.0, mural.z);
+    labGroup.add(frame);
+
+    artLoader.load(mural.url, (tex) => {
+      tex.colorSpace = T.SRGBColorSpace;
+      const artPlane = new T.Mesh(
+        new T.PlaneGeometry(42.2, 22.8),
+        new T.MeshBasicMaterial({ map: tex })
+      );
+      artPlane.rotation.y = mural.rotY;
+      artPlane.position.set(mural.x + (mural.x < 0 ? 0.65 : -0.65), 42.0, mural.z);
+      labGroup.add(artPlane);
+    });
+  });
+
+  // Lab Lighting Rig (unshadowed studio points for locked 60 FPS)
+  const labOverheadLight = new T.PointLight(0xf6f9ff, 1450, 175, 2);
+  labOverheadLight.position.set(0, 72, 166);
+  labGroup.add(labOverheadLight);
+
+  const labMonitorFill = new T.PointLight(0x9be8ff, 340, 80, 2);
+  labMonitorFill.position.set(-2, 42, 178);
+  labGroup.add(labMonitorFill);
+
+  const labAccentGlow = new T.PointLight(0x76b900, 220, 75, 2);
+  labAccentGlow.position.set(0, 18, 144);
+  labGroup.add(labAccentGlow);
+
+  // Interactive Lab & Player State
+  const WORLD_METER_SCALE = 34.0;
+  const workstationPos = new T.Vector3(0, 0, 164.0);
+  const keyboardMountPos = new T.Vector3(-3.4, 25.84, 168.08);
+  const pedestalSpinners = [];
+  const keyboardKeysMap = new Map();
+  let keyboardHitProxy = null;
+  let workstationHitProxy = null;
+
+  const playerRig = {
+    root: null,
+    pelvis: null,
+    torso: null,
+    head: null,
+    armL: null,
+    armR: null,
+    legL: null,
+    legR: null,
+    hitProxy: null,
+    pos: new T.Vector3(45.0, 0.0, 166.0),
+    rotY: Math.PI * 0.80,
+    walkPhase: 0.0,
+    isMoving: false,
+  };
+
+  // O(1) Click Hit Proxy on the Gaming Keyboard so users can click it to zoom in
+  keyboardHitProxy = new T.Mesh(
+    new T.BoxGeometry(14.5, 4.5, 8.5),
+    new T.MeshBasicMaterial({ visible: false })
+  );
+  keyboardHitProxy.position.set(keyboardMountPos.x, keyboardMountPos.y + 1.5, keyboardMountPos.z);
+  keyboardHitProxy.name = "GamingKeyboardHitProxy";
+  labGroup.add(keyboardHitProxy);
+
+  workstationHitProxy = new T.Mesh(
+    new T.BoxGeometry(72.0, 48.0, 32.0),
+    new T.MeshBasicMaterial({ visible: false })
+  );
+  workstationHitProxy.position.set(workstationPos.x, 24.0, workstationPos.z);
+  workstationHitProxy.name = "LabWorkstationHitProxy";
+  labGroup.add(workstationHitProxy);
 
   const supportLoader = new GLTFLoader();
   const tunedSupportMaterials = new Set();
@@ -2078,11 +2370,115 @@ export function createServerRoom(scene, options = {}) {
       });
   }
 
+  function placeCustomLabAsset(assetKey, gltfScene) {
+    if (assetKey === "workstation") {
+      const ws = gltfScene;
+      ws.name = "Blender_LabWorkstation";
+      ws.scale.setScalar(WORLD_METER_SCALE);
+      ws.position.copy(workstationPos);
+      ws.traverse((child) => {
+        if (!child.isMesh || !child.material) return;
+        if ("envMapIntensity" in child.material) {
+          child.material.envMapIntensity = 0.72;
+        }
+      });
+      labGroup.add(ws);
+      return;
+    }
+
+    if (assetKey === "keyboard") {
+      const kb = gltfScene;
+      kb.name = "Blender_GamingKeyboard";
+      kb.scale.setScalar(WORLD_METER_SCALE * 1.05);
+      kb.position.copy(keyboardMountPos);
+      kb.traverse((child) => {
+        if (!child.isMesh) return;
+        if (child.name && child.name.startsWith("Key_")) {
+          // Strip optional _Mesh suffix from Blender object/mesh naming
+          const rawKey = child.name.replace(/_Mesh$/, "");
+          // Clone material per keycap so individual key press RGB flash works cleanly
+          child.material = child.material.clone();
+          keyboardKeysMap.set(rawKey, {
+            mesh: child,
+            baseY: child.position.y,
+            pressProgress: 0.0,
+            isDown: false,
+            origEmissive: child.material.emissive ? child.material.emissive.clone() : new T.Color(0x000000),
+            origEmissiveInt: child.material.emissiveIntensity || 0.0,
+          });
+        }
+      });
+      labGroup.add(kb);
+      return;
+    }
+
+    if (assetKey === "player") {
+      const pl = gltfScene;
+      pl.name = "Blender_PlayerAvatar";
+      pl.scale.setScalar(29.0);
+      pl.position.copy(playerRig.pos);
+      pl.rotation.y = playerRig.rotY;
+
+      pl.traverse((obj) => {
+        if (obj.name === "Player_Pelvis") playerRig.pelvis = obj;
+        else if (obj.name === "Player_Torso") playerRig.torso = obj;
+        else if (obj.name === "Player_Head") playerRig.head = obj;
+        else if (obj.name === "Player_Arm_L") playerRig.armL = obj;
+        else if (obj.name === "Player_Arm_R") playerRig.armR = obj;
+        else if (obj.name === "Player_Leg_L") playerRig.legL = obj;
+        else if (obj.name === "Player_Leg_R") playerRig.legR = obj;
+      });
+      if (playerRig.pelvis) {
+        playerRig.pelvisBaseY = playerRig.pelvis.position.y;
+      }
+      playerRig.root = pl;
+
+      const pHit = new T.Mesh(
+        new T.BoxGeometry(0.65, 1.85, 0.55),
+        new T.MeshBasicMaterial({ visible: false })
+      );
+      pHit.position.set(0, 0.92, 0);
+      pHit.name = "PlayerAvatarHitProxy";
+      pl.add(pHit);
+      playerRig.hitProxy = pHit;
+
+      labGroup.add(pl);
+      return;
+    }
+
+    if (assetKey === "pedestal") {
+      [
+        { x: -31.0, z: 142.0, rotY: 0.35 },
+        { x: 31.0, z: 142.0, rotY: -0.35 },
+      ].forEach((p, idx) => {
+        const ped = gltfScene.clone(true);
+        ped.name = `Blender_GpuCorePedestal_${idx}`;
+        ped.scale.setScalar(WORLD_METER_SCALE);
+        ped.position.set(p.x, 0, p.z);
+        ped.rotation.y = p.rotY;
+        ped.traverse((obj) => {
+          if (obj.name === "Pedestal_Core_Spinner") {
+            pedestalSpinners.push({
+              obj,
+              baseY: obj.position.y,
+              phaseOffset: idx * Math.PI * 0.7,
+            });
+          }
+        });
+        labGroup.add(ped);
+      });
+    }
+  }
+
   Object.entries(assetUrls).forEach(([assetKey, url]) => {
     supportLoader.load(
       url,
       (gltf) => {
-        placeSupportAsset(assetKey, gltf.scene);
+        if (["workstation", "keyboard", "player", "pedestal"].includes(assetKey)) {
+          placeCustomLabAsset(assetKey, gltf.scene);
+        } else {
+          placeSupportAsset(assetKey, gltf.scene);
+        }
         finishSupportAsset();
       },
       undefined,
@@ -2175,6 +2571,38 @@ export function createServerRoom(scene, options = {}) {
       minDistance: 4,
       maxDistance: 240,
     },
+    lab: {
+      // Wide elevated architectural view showing full Desk, Keyboard, Triple Monitors,
+      // Panoramic Glass PC Tower, Gaming Chair, Player Avatar, Cryo Pedestals & Aisle 04.
+      position: new T.Vector3(-12.0, 56.0, 206.0),
+      target: new T.Vector3(4.0, 26.0, 118.0),
+      fov: 54,
+      minDistance: 6,
+      maxDistance: 190,
+    },
+    keyboard: {
+      // Macro showcase framing the Blender-authored 3D mechanical gaming keyboard + coiled cable + wrist rest
+      position: new T.Vector3(-4.2, 36.8, 181.2),
+      target: new T.Vector3(-3.4, 26.2, 168.1),
+      fov: 35,
+      minDistance: 3.5,
+      maxDistance: 60,
+    },
+    computer: {
+      // Unobstructed showcase framing the panoramic glass liquid-cooled PC rig & triple monitors
+      position: new T.Vector3(10.0, 39.0, 186.0),
+      target: new T.Vector3(24.5, 32.5, 164.5),
+      fov: 38,
+      minDistance: 5.0,
+      maxDistance: 90,
+    },
+    player: {
+      position: new T.Vector3(45.0, 54.0, 206.0),
+      target: new T.Vector3(45.0, 30.0, 166.0),
+      fov: 48,
+      minDistance: 20,
+      maxDistance: 120,
+    },
   };
 
   // -------------------------------------------------------------------------
@@ -2220,6 +2648,10 @@ export function createServerRoom(scene, options = {}) {
 
   function getCameraPreset(name) {
     const key = String(name || "facility").toLowerCase();
+    if (key.includes("key")) return cameraPresets.keyboard;
+    if (key.includes("comp") || key.includes("pc")) return cameraPresets.computer;
+    if (key.includes("play") || key.includes("walk")) return cameraPresets.player;
+    if (key.includes("lab")) return cameraPresets.lab;
     if (key.includes("fac") || key.includes("aisle") || key.includes("default")) {
       return cameraPresets.facility;
     }
@@ -2232,6 +2664,103 @@ export function createServerRoom(scene, options = {}) {
     if (key.includes("rack")) return cameraPresets.rack;
     if (key.includes("fly")) return cameraPresets.flythrough;
     return cameraPresets[name] || cameraPresets.facility;
+  }
+
+  function triggerKeyPress(code, isDown) {
+    const mapCode = {
+      KeyW: "Key_W", KeyA: "Key_A", KeyS: "Key_S", KeyD: "Key_D",
+      KeyE: "Key_E", KeyR: "Key_R", KeyT: "Key_T", KeyM: "Key_M",
+      KeyO: "Key_O", KeyQ: "Key_Q", KeyF: "Key_F", KeyC: "Key_C",
+      Space: "Key_Space", Enter: "Key_Enter", Escape: "Key_Esc",
+      ArrowUp: "Key_Up", ArrowDown: "Key_Down", ArrowLeft: "Key_Left", ArrowRight: "Key_Right",
+      Digit1: "Key_1", Digit2: "Key_2", Digit3: "Key_3", Digit4: "Key_4",
+      Digit5: "Key_5", Digit6: "Key_6", Digit7: "Key_7", Digit8: "Key_8",
+    };
+    const keyName = mapCode[code] || code;
+    const entry = keyboardKeysMap.get(keyName);
+    if (entry) entry.isDown = Boolean(isDown);
+  }
+
+  function clampPlayerPosition(nx, nz) {
+    // Allow walking smoothly inside the Lab Deck (Z: +126..+202) and down Aisle 04 (Z: -195..+126)
+    let x = nx;
+    let z = Math.max(-192, Math.min(200, nz));
+
+    if (z <= 127.0) {
+      // Inside Aisle 04 / Glass Portal / Support Hall
+      x = Math.max(-13.5, Math.min(13.5, x));
+      // Avoid clipping into Hero Tray when extended into aisle
+      if (currentTrayFactor > 0.35 && z > heroZ - 12.5 && z < heroZ + 12.5 && x < -4.0) {
+        x = -4.0;
+      }
+    } else {
+      // Inside Computer Lab Observation Wing
+      x = Math.max(-60.0, Math.min(60.0, x));
+      // Desk + Chair collision box around X in [-38..38], Z in [147..196]
+      if (Math.abs(x) < 38.0 && z > 147.0 && z < 196.0) {
+        const dxEdge = 38.0 - Math.abs(x);
+        const dzFront = z - 147.0;
+        const dzBack = 196.0 - z;
+        if (dxEdge < dzFront && dxEdge < dzBack) {
+          x = x >= 0 ? 38.0 : -38.0;
+        } else if (dzFront < dzBack) {
+          z = 147.0;
+        } else {
+          z = 196.0;
+        }
+      }
+      // Cryo Core Pedestal collision circles at (+-31, 142)
+      [-31.0, 31.0].forEach((px) => {
+        const dx = x - px;
+        const dz = z - 142.0;
+        const dist = Math.hypot(dx, dz);
+        if (dist < 14.5 && dist > 0.001) {
+          x = px + (dx / dist) * 14.5;
+          z = 142.0 + (dz / dist) * 14.5;
+        }
+      });
+    }
+    return { x, z };
+  }
+
+  function setPlayerMovement(forward, right, viewYaw, dt) {
+    if (!playerRig.root) return false;
+    const mag = Math.hypot(forward, right);
+    if (mag < 0.01) {
+      playerRig.isMoving = false;
+      return false;
+    }
+
+    const nf = forward / Math.max(1.0, mag);
+    const nr = right / Math.max(1.0, mag);
+    // View direction in XZ: camera forward is (-sin(yaw), -cos(yaw)), right is (cos(yaw), -sin(yaw))
+    const moveX = (-Math.sin(viewYaw) * nf + Math.cos(viewYaw) * nr);
+    const moveZ = (-Math.cos(viewYaw) * nf - Math.sin(viewYaw) * nr);
+
+    const speed = 44.0 * Math.min(dt || 0.016, 0.05);
+    const next = clampPlayerPosition(playerRig.pos.x + moveX * speed, playerRig.pos.z + moveZ * speed);
+    playerRig.pos.x = next.x;
+    playerRig.pos.z = next.z;
+    playerRig.root.position.copy(playerRig.pos);
+
+    const targetYaw = Math.atan2(moveX, moveZ);
+    let diff = targetYaw - playerRig.rotY;
+    while (diff > Math.PI) diff -= Math.PI * 2;
+    while (diff < -Math.PI) diff += Math.PI * 2;
+    playerRig.rotY += diff * Math.min(1.0, (dt || 0.016) * 12.0);
+    playerRig.root.rotation.y = playerRig.rotY;
+    playerRig.isMoving = true;
+    return true;
+  }
+
+  function resetPlayerPosition() {
+    playerRig.pos.set(45.0, 0.0, 166.0);
+    playerRig.rotY = Math.PI * 0.80;
+    playerRig.isMoving = false;
+    if (playerRig.root) {
+      playerRig.root.position.copy(playerRig.pos);
+      playerRig.root.rotation.y = playerRig.rotY;
+    }
   }
 
   function update(delta, elapsed = 0) {
@@ -2281,6 +2810,61 @@ export function createServerRoom(scene, options = {}) {
       0.82 * pulse,
       0.11 * pulse
     );
+
+    // Levitate & rotate Cryo GPU Core spinners inside lab pedestals
+    for (let p = 0; p < pedestalSpinners.length; p++) {
+      const sp = pedestalSpinners[p];
+      sp.obj.rotation.y = elapsed * 0.85 + sp.phaseOffset;
+      sp.obj.position.y = sp.baseY + Math.sin(elapsed * 2.1 + sp.phaseOffset) * 0.025;
+    }
+
+    // Mechanical 3D Gaming Keyboard spring travel & RGB flash
+    keyboardKeysMap.forEach((k) => {
+      const target = k.isDown ? 1.0 : 0.0;
+      k.pressProgress += (target - k.pressProgress) * Math.min(1.0, dt * 24.0);
+      k.mesh.position.y = k.baseY - k.pressProgress * 0.0042;
+      if (k.mesh.material && k.mesh.material.emissive) {
+        if (k.pressProgress > 0.05) {
+          k.mesh.material.emissive.setHex(0x76b900);
+          k.mesh.material.emissiveIntensity = 1.6 * k.pressProgress;
+        } else {
+          k.mesh.material.emissive.copy(k.origEmissive);
+          k.mesh.material.emissiveIntensity = k.origEmissiveInt;
+        }
+      }
+    });
+
+    // Articulated Player Model walk & idle breathing animation
+    if (playerRig.root) {
+      if (playerRig.isMoving) {
+        playerRig.walkPhase += dt * 9.5;
+        const swing = Math.sin(playerRig.walkPhase) * 0.58;
+        if (playerRig.legL) playerRig.legL.rotation.x = swing;
+        if (playerRig.legR) playerRig.legR.rotation.x = -swing;
+        if (playerRig.armL) playerRig.armL.rotation.x = -swing * 0.68;
+        if (playerRig.armR) playerRig.armR.rotation.x = swing * 0.68;
+        if (playerRig.pelvis && playerRig.pelvisBaseY !== undefined) {
+          playerRig.pelvis.position.y = playerRig.pelvisBaseY + Math.abs(Math.cos(playerRig.walkPhase)) * 0.032;
+        }
+        if (playerRig.torso) playerRig.torso.rotation.y = Math.sin(playerRig.walkPhase) * 0.06;
+      } else {
+        const relax = Math.min(1.0, dt * 10.0);
+        if (playerRig.legL) playerRig.legL.rotation.x *= (1.0 - relax);
+        if (playerRig.legR) playerRig.legR.rotation.x *= (1.0 - relax);
+        if (playerRig.armL) playerRig.armL.rotation.x *= (1.0 - relax);
+        if (playerRig.armR) playerRig.armR.rotation.x *= (1.0 - relax);
+        if (playerRig.torso) {
+          playerRig.torso.rotation.y *= (1.0 - relax);
+          playerRig.torso.rotation.x = Math.sin(elapsed * 1.6) * 0.015;
+        }
+        if (playerRig.head) {
+          playerRig.head.rotation.y = Math.sin(elapsed * 0.7) * 0.14;
+        }
+        if (playerRig.pelvis && playerRig.pelvisBaseY !== undefined) {
+          playerRig.pelvis.position.y = playerRig.pelvisBaseY + Math.sin(elapsed * 1.6) * 0.008;
+        }
+      }
+    }
   }
 
   function dispose() {
@@ -2307,6 +2891,19 @@ export function createServerRoom(scene, options = {}) {
     getHeroTrayFactor: () => currentTrayFactor,
     getHeroGpuMount,
     getCameraPreset,
+    labTargets: {
+      keyboardHitProxy,
+      workstationHitProxy,
+      playerRig,
+    },
+    triggerKeyPress,
+    setPlayerMovement,
+    resetPlayerPosition,
+    getPlayerTransform: () => ({
+      position: playerRig.pos,
+      rotationY: playerRig.rotY,
+      isReady: Boolean(playerRig.root),
+    }),
     assetsReady,
     update,
     dispose,

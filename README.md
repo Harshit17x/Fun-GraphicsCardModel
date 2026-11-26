@@ -25,23 +25,37 @@
 
 <div align="center">
 
-### 🏢 1. Facility Aisle View — Macro Datacenter Corridor
-<img src="assets/datacenter-ui-view.jpg" alt="Datacenter Aisle View" width="100%"/>
-<p><em>Real-time Three.js WebGL simulation: Dual 42U DGX server rows, reflective raised floor, illuminated aisle signage, and clean minimalist UI.</em></p>
+### 🧪 1. Computer Lab Observation Deck & Glass Portal into Aisle 04
+<img src="assets/lab-view.jpg" alt="Computer Lab and Server Aisle View" width="100%"/>
+<p><em>Blender-authored Gaming Workstation, 3D Mechanical Keyboard, Triple Telemetry Monitors, Panoramic Liquid-Cooled PC, Cyber-Engineer Player Avatar, and Twin Cryo GPU Core Pedestals overlooking the 42U DGX SuperPOD Aisle.</em></p>
 
 <br/>
 
-| 🗄️ 2. 4U Compute Blade (Rack A04 Extended) | 🔬 3. RTX 4090 8-Layer Exploded View |
+| ⌨️ 2. 3D Mechanical Gaming Keyboard (Live Reactive) | 🖥️ 3. Panoramic Liquid-Cooled PC Tower |
+| :---: | :---: |
+| <img src="assets/keyboard-view.jpg" alt="3D Mechanical Gaming Keyboard" width="540"/> | <img src="assets/computer-pc-view.jpg" alt="Gaming PC Tower and Telemetry Monitor" width="540"/> |
+| *75% sculpted keycaps, rotary knob, OLED screen, coiled aviator cable & AD102 desk mat.* | *Tempered glass dual-chamber rig with RTX GPU, DDR5 RAM & custom cooling loop.* |
+
+<br/>
+
+| 🚶 4. Third-Person Player Walk Mode | 🏢 5. Facility Aisle 04 (Macro Corridor) |
+| :---: | :---: |
+| <img src="assets/player-view.jpg" alt="Player Walk Mode inside Aisle 04" width="540"/> | <img src="assets/datacenter-ui-view.jpg" alt="Datacenter Aisle View" width="540"/> |
+| *Walk the articulated Cyber-Engineer avatar with WASD between Lab & Server Aisle.* | *Dual 42U DGX server rows, reflective floor tiles & illuminated wayfinding.* |
+
+<br/>
+
+| 🗄️ 6. 4U Compute Blade (Rack A04 Extended) | 🔬 7. RTX 4090 8-Layer Exploded View |
 | :---: | :---: |
 | <img src="assets/datacenter-blade-view.jpg" alt="4U GPU Compute Blade" width="540"/> | <img src="assets/rtx4090-exploded-view.jpg" alt="RTX 4090 Exploded View" width="540"/> |
 | *Slide-out 4U chassis with 8× GPU bay and hero RTX 4090.* | *Real-time deconstruction into 8 constituent assemblies with 3D callouts.* |
 
 <br/>
 
-| 📐 4. Datacenter Architectural Reference | 🗺️ 5. Multi-Scale Hierarchy Diagram |
+| 🎨 8. Concept Vision (Image-Gen Design) | 🗺️ 9. Multi-Scale Hierarchy Diagram |
 | :---: | :---: |
-| <img src="assets/datacenter-reference.webp" alt="Datacenter Reference Photo" width="540"/> | <img src="assets/architecture-diagram.svg" alt="System Architecture Diagram" width="540"/> |
-| *Inspiratory photo of high-density containment corridor.* | *4-tier zoom pipeline from macro facility to nanoscale silicon.* |
+| <img src="assets/lab_concept_vision.jpg" alt="AI Lab Concept Vision" width="540"/> | <img src="assets/architecture-diagram.svg" alt="System Architecture Diagram" width="540"/> |
+| *AI-generated architectural vision guiding the Lab, PC, Keyboard & Cryo Core design.* | *Multi-scale interactive pipeline from Command Lab to nanoscale silicon.* |
 
 </div>
 
@@ -117,16 +131,18 @@ When toggling the **Exploded View**, the card separates into its precision-engin
 
 | Shortcut | UI Action | Description |
 | :---: | :--- | :--- |
-| <kbd>1</kbd> | **Facility Aisle View** | Switch to wide macro datacenter corridor perspective |
-| <kbd>2</kbd> | **Server Rack View** | Focus camera on Hero Cabinet A04 |
-| <kbd>3</kbd> | **GPU Blade View** | Inspect slide-out 4U 8× GPU compute sled |
-| <kbd>4</kbd> | **GPU Explode View** | Enter macro mode for RTX 4090 deconstruction |
+| <kbd>1</kbd> | **Computer Lab View** | Panoramic Lab desk, triple monitors, PC rig, keyboard & glass portal |
+| <kbd>2</kbd> | **3D Keyboard View** | Macro close-up of the Blender mechanical gaming keyboard |
+| <kbd>3</kbd> | **Player Walk Mode** | Third-person control (`W/A/S/D` or Arrows) to explore Lab & Server Room |
+| <kbd>4</kbd> | **Facility Aisle View** | Switch to wide macro datacenter corridor perspective |
+| <kbd>5</kbd> | **Server Rack View** | Focus camera on Hero Cabinet A04 |
+| <kbd>6</kbd> | **GPU Blade View** | Inspect slide-out 4U 8× GPU compute sled |
+| <kbd>7</kbd> | **GPU Explode View** | Enter macro mode for RTX 4090 8-layer deconstruction |
 | <kbd>D</kbd> | **Toggle Rack Door** | Smoothly pivot glass rack door open / closed (0°–95°) |
 | <kbd>T</kbd> | **Toggle Compute Tray** | Telescopically slide the 4U compute sled in / out |
 | <kbd>S</kbd> | **Toggle Audio Hum** | Mute / unmute procedural Web Audio datacenter hum |
 | <kbd>Space</kbd> / <kbd>E</kbd> | **Toggle Explode View** | Separate / re-assemble all 8 GPU engineering layers |
 | <kbd>M</kbd> | **Switch Explode Mode** | Toggle between **3D Stack** and **Linear Blueprint** modes |
-| <kbd>5</kbd>–<kbd>8</kbd> | **Focus Component** | Quick-focus on specific hardware parts (Shroud, Fan, Heatsink, PCB) |
 | <kbd>Esc</kbd> | **Exit Focus** | Clear component isolation and return to current overview |
 | <kbd>O</kbd> | **Toggle Auto-Orbit** | Continuous 360° product turntable showcase |
 | <kbd>R</kbd> | **Reset Camera** | Restore default camera distance, angle, and target |
